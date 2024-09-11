@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import "./PasswordInput.css"; // Import the dedicated CSS file
+import "./PasswordInput.css"; 
+import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 
 const PasswordInput = ({ value, onChange, placeholder }) => {
   const [isShowPassword, setIsShowPassword] = useState(false);
   const toggleShowPassword = () => {
-    setIsShowPassword(!isShowPassword);
+    setIsShowPassword((prevState) => !prevState);
   };
 
   return (
@@ -16,9 +17,19 @@ const PasswordInput = ({ value, onChange, placeholder }) => {
         placeholder={placeholder || "Password"}
         className="password-input-field"
       />
-      <button type="button" onClick={toggleShowPassword} className="toggle-password-btn">
-        {isShowPassword ? "Hide" : "Show"}
-      </button>
+       {isShowPassword ? (
+        <FaRegEye
+          size={22}
+          onClick={toggleShowPassword}
+          className="toggle-password-btn"
+        />
+      ) : (
+        <FaRegEyeSlash
+          size={22}
+          onClick={toggleShowPassword}
+          className="toggle-password-btn"
+        />
+      )}
     </div>
   );
 };
