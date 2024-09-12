@@ -46,7 +46,7 @@ const SignUp = () => {
       <div className="signup-container">
         <div className="signup-form">
           <form onSubmit={handleSignUp}>
-            <h4 className="signup-title">Sign Up</h4>
+            <h4 className="signup-title">Register</h4>
 
             <label htmlFor="firstName" className="visually-hidden">First name</label>
             <div className={`input-wrapper ${error.firstName ? "input-error" : ""}`}>

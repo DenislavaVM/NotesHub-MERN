@@ -16,7 +16,9 @@ const Navbar = () => {
     <div className="navbar">
       <h2 className="navbar-title">Notes</h2>
 
-      <SearchBar />
+      <div className="navbar-center">
+        <SearchBar />
+      </div>
 
       <ProfileInfo onLogout={onLogout}/>
     </div>
