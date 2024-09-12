@@ -48,7 +48,6 @@ const SignUp = () => {
           <form onSubmit={handleSignUp}>
             <h4 className="signup-title">Register</h4>
 
-            <label htmlFor="firstName" className="visually-hidden">First name</label>
             <div className={`input-wrapper ${error.firstName ? "input-error" : ""}`}>
               <input
                 id="firstName"
@@ -63,7 +62,6 @@ const SignUp = () => {
               {error.firstName && <p className="error-message">{error.firstName}</p>}
             </div>
 
-            <label htmlFor="lastName" className="visually-hidden">Last name</label>
             <div className={`input-wrapper ${error.lastName ? "input-error" : ""}`}>
               <input
                 id="lastName"
@@ -78,7 +76,6 @@ const SignUp = () => {
               {error.lastName && <p className="error-message">{error.lastName}</p>}
             </div>
 
-            <label htmlFor="email" className="visually-hidden">Email</label>
             <div className={`input-wrapper ${error.email ? "input-error" : ""}`}>
               <input
                 id="email"

@@ -34,7 +34,6 @@ const Login = () => {
         <div className="login-form">
           <h4 className="login-title">Login</h4>
           <form onSubmit={handleLogin}>
-          <label htmlFor="email" className="visually-hidden">Email</label>
             <input 
               id="email"
               type="text" 

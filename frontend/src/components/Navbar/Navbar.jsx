@@ -22,19 +22,20 @@ const Navbar = () => {
 
   return (
     <div className="navbar">
-      <h2 className="navbar-title">Notes</h2>
-
+      <div className="navbar-left">
+        <h2 className="navbar-title">Notes</h2>
+      </div>
       <div className="navbar-center">
-        <SearchBar value={searchQuery}
-        onChange={({ target }) => {
-          setSearchQuery(target.value);
-        }}
-        handleSearch={handleSearch}
-        onClearSearch={onClearSearch}
+        <SearchBar
+          value={searchQuery}
+          onChange={({ target }) => setSearchQuery(target.value)}
+          handleSearch={handleSearch}
+          onClearSearch={onClearSearch}
         />
       </div>
-
-      <ProfileInfo onLogout={onLogout}/>
+      <div className="navbar-right">
+        <ProfileInfo onLogout={onLogout} />
+      </div>
     </div>
   );
 };

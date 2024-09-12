@@ -2,4 +2,133 @@
 
 body {
   font-family: "Nunito", sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 50px;
+  font-size: 1rem;
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1rem;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+  box-shadow: 0 6px 12px rgba(0, 123, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.btn-primary:active {
+  background-color: #004085;
+  box-shadow: 0 3px 6px rgba(0, 123, 255, 0.2);
+  transform: translateY(0);
+}
+
+.add-button {
+  width: 4rem;
+  height: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4f46e5, #3b82f6);
+  box-shadow: 0 8px 15px rgba(59, 130, 246, 0.3);
+  position: fixed;
+  right: 2.5rem;
+  bottom: 2.5rem;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.add-button:hover {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 20px rgba(59, 130, 246, 0.5);
+}
+
+.add-button:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 10px rgba(59, 130, 246, 0.3);
+}
+
+.clear-button {
+  background-color: #e5e7eb;
+  color: #374151;
+  border-radius: 4px;
+  padding: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.clear-button:hover {
+  background-color: #d1d5db;
+  transform: translateY(-2px);
+}
+
+.clear-button:active {
+  background-color: #cbd5e1;
+  transform: translateY(0);
+}
+
+.input-box {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 50px;
+  font-size: 1rem;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.input-box:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+@media screen and (max-width: 600px) {
+  .navbar {
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+  }
+
+  .navbar-left,
+  .navbar-right {
+    margin-bottom: 1rem;
+  }
+
+  .navbar-title {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+
+  .navbar-center {
+    width: 100%;
+    padding: 0 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .search-bar-container {
+    width: 90%;
+    max-width: 100%;
+  }
+
+  .profile-info-container {
+    width: 100%;
+    justify-content: center;
+  }
 }
