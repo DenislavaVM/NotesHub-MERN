@@ -1,15 +1,56 @@
-import React from "react";
-import "./AddEditNotes.css"; 
+import React, { useState } from "react";
+import "./AddEditNotes.css";
+import TagInput from "../../components/input/TagInput";
+import { MdClose } from "react-icons/md";
 
-const AddEditNotes = () => {
+const AddEditNotes = ({ noteData, type, onClose }) => {
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [tags, setTags] = useState([]);
+  const [error, setError] = useState(null);
+
+  const addNewNode = async () => {
+    // Logic to add a new note
+  };
+
+  const editNote = async () => {
+    // Logic to edit a note
+  };
+
+  const handleAddNote = () => {
+    if (!title) {
+      setError("Please enter the title");
+      return;
+    }
+
+    if (!content) {
+      setError("Please enter the content");
+      return;
+    }
+
+    setError("");
+
+    if (type === "edit") {
+      editNote();
+    } else {
+      addNewNode();
+    }
+  };
+
   return (
     <div className="add-edit-notes-container">
+      <button className="close-button" onClick={onClose}>
+        <MdClose className="close-icon" />
+      </button>
+
       <div className="input-group">
         <label className="input-label">Title</label>
         <input
           type="text"
           className="input-title"
           placeholder="Enter note title..."
+          value={title}
+          onChange={({ target }) => setTitle(target.value)}
         />
       </div>
 
@@ -19,6 +60,8 @@ const AddEditNotes = () => {
           className="textarea-content"
           placeholder="Write your content here..."
           rows={10}
+          value={content}
+          onChange={({ target }) => setContent(target.value)}
         />
       </div>
 
@@ -29,9 +72,14 @@ const AddEditNotes = () => {
           className="input-tags"
           placeholder="Enter tags separated by commas..."
         />
+        <TagInput tags={tags} setTags={setTags} />
       </div>
 
-      <button className="btn-primary add-btn">Add Note</button>
+      {error && <p className="error-message">{error}</p>}
+
+      <button className="btn-primary add-btn" onClick={handleAddNote}>
+        Add Note
+      </button>
     </div>
   );
 };

@@ -19,16 +19,16 @@ const Home = () => {
 
       <div className="home-container">
         <div className="note-grid">
-          <NoteCard 
-            title="Meeting on 30th September" 
-            date="20th Sep 2024" 
+          <NoteCard
+            title="Meeting on 30th September"
+            date="20th Sep 2024"
             content="Meeting on 30th September"
-            tags="#meeting" 
+            tags="#meeting"
             isPinned={true}
-            onEdit={()=>{}}
-            onDelete={()=>{}}
-            onPinNote={()=>{}}
-          /> 
+            onEdit={() => { }}
+            onDelete={() => { }}
+            onPinNote={() => { }}
+          />
         </div>
       </div>
 
@@ -51,7 +51,13 @@ const Home = () => {
         }}
         className="modal-content"
       >
-        <AddEditNotes /> 
+        <AddEditNotes
+          type={openAddEditModel.type}
+          noteData={openAddEditModel.data}
+          onClose={() => {
+            setOpenAddEditModal({ isShown: false, type: "add", data: null })
+          }}
+        />
       </Modal>
     </>
   );
