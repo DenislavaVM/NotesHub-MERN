@@ -72,10 +72,14 @@ app.post("/create-account", async (req, res) => {
 
     await user.save();
 
+    const accessToken = jwt.sign({ user: { _id: user._id } }, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: "36000m",
+    });
+    /*
     const accessToken = jwt.sign({ user }, process.env.ACCESS_TOKEN_SECRET, {
         expiresIn: "36000m",
     });
-
+*/
     return res.json({
         error: false,
         user,
@@ -99,7 +103,7 @@ app.post("/login", async (req, res) => {
             .json({ message: "Password is required" });
     }
 
-    const userInfo = await User.findOne({ email: email });
+    const userInfo = await User.findOne({ email });
 
     if (!userInfo) {
         return res
@@ -107,18 +111,13 @@ app.post("/login", async (req, res) => {
             .json({ message: "User not found" })
     }
 
-    if (userInfo.email == email && userInfo.password == password) {
+    if (userInfo.password === password) {
         const user = { user: userInfo };
         const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
             expiresIn: "36000m"
         });
 
-        return res.json({
-            error: false,
-            message: "Login successful",
-            email,
-            accessToken,
-        })
+        return res.json({ error: false, message: "Login successful", email, accessToken });
     } else {
         return res.status(400).json({
             error: true,
@@ -128,7 +127,7 @@ app.post("/login", async (req, res) => {
 });
 
 app.get("/get-user", authenticateToken, async (req, res) => {
-    const { user } = req.user;
+    const user = req.user;
 
     const isUser = await User.findOne({ _id: user._id });
 
@@ -138,9 +137,10 @@ app.get("/get-user", authenticateToken, async (req, res) => {
 
     return res.json({
         user: {
-            fullName: isUser.fullName,
+            firstName: isUser.firstName,
+            lastName: isUser.lastName,
             email: isUser.email,
-            "_id": isUser._id,
+            _id: isUser._id,
             createdOn: isUser.createdOn
         },
         message: "",
@@ -187,7 +187,7 @@ app.post("/add-note", authenticateToken, async (req, res) => {
 });
 
 app.put("/edit-note/:noteId", authenticateToken, async (req, res) => {
-    const nodeId = req.params.noteId;
+    const noteId = req.params.noteId;
     const { title, content, tags, isPinned } = req.body;
     const { user } = req.user;
 
@@ -198,7 +198,7 @@ app.put("/edit-note/:noteId", authenticateToken, async (req, res) => {
     }
 
     try {
-        const note = await Note.findOne({ _id: nodeId, userId: user._id });
+        const note = await Note.findOne({ _id: noteId, userId: user._id });
 
         if (!note) {
             return res
@@ -287,12 +287,12 @@ app.delete("/delete-note/:noteId", authenticateToken, async (req, res) => {
 });
 
 app.put("/update-note-pinned/:noteId", authenticateToken, async (req, res) => {
-    const nodeId = req.params.noteId;
+    const noteId = req.params.noteId;
     const { isPinned } = req.body;
     const { user } = req.user;
 
     try {
-        const note = await Note.findOne({ _id: nodeId, userId: user._id });
+        const note = await Note.findOne({ _id: noteId, userId: user._id });
 
         if (!note) {
             return res
