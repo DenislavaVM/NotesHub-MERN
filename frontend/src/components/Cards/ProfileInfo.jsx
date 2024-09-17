@@ -2,17 +2,22 @@ import React from "react";
 import "./ProfileInfo.css";
 import { getInitials } from "../../utils/helper";
 
+const ProfileInfo = ({ userInfo, onLogout }) => {
+  if (!userInfo) {
+    return null;
+  }
 
-const ProfileInfo = ({ onLogout }) => {
-  
+  const userName = `${userInfo.firstName} ${userInfo.lastName}`;
+  const initials = getInitials(userName);
+
   return (
     <div className="profile-info-container">
       <div className="profile-avatar">
-        {getInitials("Denislava Milanova")}
+        {initials}
       </div>
 
       <div>
-        <p className="profile-name">Denislava Milanova</p>
+        <p className="profile-name">{userName}</p>
         <button className="logout-button" onClick={onLogout}>
           Logout
         </button>

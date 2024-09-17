@@ -72,14 +72,14 @@ app.post("/create-account", async (req, res) => {
 
     await user.save();
 
-    const accessToken = jwt.sign({ user: { _id: user._id } }, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: "36000m",
-    });
-    /*
-    const accessToken = jwt.sign({ user }, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: "36000m",
-    });
-*/
+    const accessToken = jwt.sign(
+        { user: { _id: user._id, firstName: user.firstName, lastName: user.lastName, email: user.email } },
+        process.env.ACCESS_TOKEN_SECRET,
+        {
+          expiresIn: "36000m",
+        }
+      );
+
     return res.json({
         error: false,
         user,
@@ -112,9 +112,9 @@ app.post("/login", async (req, res) => {
     }
 
     if (userInfo.password === password) {
-        const user = { user: userInfo };
-        const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-            expiresIn: "36000m"
+        const user = { _id: userInfo._id, firstName: userInfo.firstName, lastName: userInfo.lastName, email: userInfo.email };
+        const accessToken = jwt.sign({ user }, process.env.ACCESS_TOKEN_SECRET, {
+          expiresIn: "36000m",
         });
 
         return res.json({ error: false, message: "Login successful", email, accessToken });
