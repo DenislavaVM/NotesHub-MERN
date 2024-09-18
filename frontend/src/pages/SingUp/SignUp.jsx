@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import Navbar from "../../components/Navbar/Navbar";
 import PasswordInput from "../../components/input/PasswordInput";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { validateEmail } from "../../utils/helper";
 import "./SignUp.css";
+import apiClient from "../../utils/apiClient";
 
 const SignUp = () => {
   const [firstName, setFirstName] = useState("");
@@ -11,6 +12,8 @@ const SignUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState({});
+
+  const navigate = useNavigate();
 
   const handleSignUp = async (e) => {
     e.preventDefault();
@@ -37,7 +40,29 @@ const SignUp = () => {
       return;
     }
 
-    setError({});
+    setError({}); 
+
+    try {
+      const response = await apiClient.post("/create-account", {
+        firstName,
+        lastName,
+        email,
+        password,
+      });
+
+      if (response.data && response.data.accessToken) {
+        localStorage.setItem("token", response.data.accessToken);
+        navigate("/dashboard");
+      } else if (response.data && response.data.message) {
+        setError({ form: response.data.message });
+      }
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.message) {
+        setError({ form: error.response.data.message });
+      } else {
+        setError({ form: "An unexpected error occurred. Please try again." });
+      }
+    }
   };
 
   return (
@@ -99,6 +124,8 @@ const SignUp = () => {
               {error.password && <span className="error-icon">!</span>}
               {error.password && <p className="error-message">{error.password}</p>}
             </div>
+
+            {error.form && <p className="error-message">{error.form}</p>}
 
             <button type="submit" className="btn-primary">Create account</button>
           </form>
