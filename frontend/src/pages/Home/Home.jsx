@@ -15,6 +15,7 @@ const Home = () => {
     data: null,
   });
 
+  const [allNotes, setAllNotes] = useState([]);
   const [userInfo, setUserInfo] = useState(null);
   const navigate = useNavigate();
 
@@ -32,7 +33,20 @@ const Home = () => {
     }
   };
 
+  const getAllNotes = async () => {
+    try {
+      const response = await apiClient.get("/get-all-notes");
+
+      if (response.data && response.data.notes) {
+        setAllNotes(response.data.notes);
+      }
+    } catch (error) {
+      console.log("An unexpexted error accured. Please try again.");
+    }
+  }
+
   useEffect(() => {
+    getAllNotes();
     getUserInfo();
   
     return () => {

@@ -238,7 +238,14 @@ app.put("/edit-note/:noteId", authenticateToken, async (req, res) => {
 });
 
 app.get("/get-all-notes", authenticateToken, async (req, res) => {
-    const { user } = req.user;
+    const user = req.user;
+
+    if (!user || !user._id) {
+        return res.status(400).json({
+            error: true,
+            message: "User not authenticated or missing user ID",
+        });
+    }
 
     try {
         const notes = await Note.find({ userId: user._id }).sort({ isPinned: -1 });
