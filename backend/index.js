@@ -148,7 +148,7 @@ app.get("/get-user", authenticateToken, async (req, res) => {
 });
 
 app.post("/add-note", authenticateToken, async (req, res) => {
-    const { title, content, tags } = req.body;
+    const { title, content, tags, isPinned } = req.body;
     const user = req.user;
 
     if (!title) {
@@ -168,6 +168,7 @@ app.post("/add-note", authenticateToken, async (req, res) => {
             title,
             content,
             tags: tags || [],
+            isPinned: isPinned || false,
             userId: user._id,
         });
 
@@ -189,7 +190,7 @@ app.post("/add-note", authenticateToken, async (req, res) => {
 app.put("/edit-note/:noteId", authenticateToken, async (req, res) => {
     const noteId = req.params.noteId;
     const { title, content, tags, isPinned } = req.body;
-    const { user } = req.user;
+    const user = req.user;
 
     if (!title && !content && !tags) {
         return res
@@ -265,7 +266,7 @@ app.get("/get-all-notes", authenticateToken, async (req, res) => {
 
 app.delete("/delete-note/:noteId", authenticateToken, async (req, res) => {
     const noteId = req.params.noteId;
-    const { user } = req.user;
+    const user = req.user;
 
     try {
         const note = await Note.findOne({ _id: noteId, userId: user._id });
@@ -274,7 +275,8 @@ app.delete("/delete-note/:noteId", authenticateToken, async (req, res) => {
             return res
                 .status(404)
                 .json({
-                    error: true, message: "Note not found"
+                    error: true,
+                    message: "Note not found"
                 });
         }
         await Note.deleteOne({ _id: noteId, userId: user._id })
@@ -295,7 +297,7 @@ app.delete("/delete-note/:noteId", authenticateToken, async (req, res) => {
 app.put("/update-note-pinned/:noteId", authenticateToken, async (req, res) => {
     const noteId = req.params.noteId;
     const { isPinned } = req.body;
-    const { user } = req.user;
+    const user = req.user;
 
     try {
         const note = await Note.findOne({ _id: noteId, userId: user._id });
