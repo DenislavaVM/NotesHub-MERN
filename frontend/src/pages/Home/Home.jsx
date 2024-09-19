@@ -53,7 +53,6 @@ const Home = () => {
       
     }
   }, [])
-  
 
   return (
     <>
@@ -61,16 +60,23 @@ const Home = () => {
 
       <div className="home-container">
         <div className="note-grid">
-          <NoteCard
-            title="Meeting on 30th September"
-            date="20th Sep 2024"
-            content="Meeting on 30th September"
-            tags="#meeting"
-            isPinned={true}
-            onEdit={() => { }}
-            onDelete={() => { }}
-            onPinNote={() => { }}
-          />
+        {allNotes && allNotes.length > 0 ? (
+      allNotes.map((note) => (
+        <NoteCard
+          key={note._id}
+          title={note.title}
+          date={note.createdOn}
+          content={note.content}
+          tags={note.tags.join(", ")}
+          isPinned={note.isPinned}
+          onEdit={() => handleEdit(note)}
+          onDelete={() => handleDelete(note._id)}
+          onPinNote={() => handlePin(note._id)}
+        />
+      ))
+    ) : (
+      <p>No notes available</p>
+    )}
         </div>
       </div>
 

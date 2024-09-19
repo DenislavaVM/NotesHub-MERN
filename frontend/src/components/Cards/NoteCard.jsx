@@ -1,6 +1,7 @@
 import React from "react";
 import { MdOutlinePushPin, MdCreate, MdDelete } from "react-icons/md";
 import "./NoteCard.css";
+import moment from "moment";
 
 const NoteCard = ({
     title,
@@ -17,7 +18,7 @@ const NoteCard = ({
         <div className="note-card-header">
             <div>
                 <h6 className="note-title">{title}</h6>
-                <span className="note-date">{date}</span>
+                <span className="note-date">{moment(date).format("Do MMM YYYY")}</span>
             </div>
 
             <MdOutlinePushPin 
