@@ -5,9 +5,9 @@ import { MdClose } from "react-icons/md";
 import apiClient from "../../utils/apiClient";
 
 const AddEditNotes = ({ noteData, type, getAllNotes, onClose }) => {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [tags, setTags] = useState([]);
+  const [title, setTitle] = useState(noteData?.title || "");
+  const [content, setContent] = useState(noteData?.content || "");
+  const [tags, setTags] = useState(noteData?.tags || []);
   const [error, setError] = useState(null);
 
   const addNewNode = async () => {
@@ -34,7 +34,27 @@ const AddEditNotes = ({ noteData, type, getAllNotes, onClose }) => {
   };
 
   const editNote = async () => {
-    // Logic to edit a note
+    const noteId = noteData._id
+    try {
+      const response = await apiClient.put("/edit-note/" + noteId, {
+        title,
+        content,
+        tags,
+      });
+
+      if (response.data && response.data.note) {
+        getAllNotes();
+        onClose();
+      }
+    } catch (error) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        setError(error.response.data.message);
+      }
+    }
   };
 
   const handleAddNote = () => {
@@ -93,7 +113,7 @@ const AddEditNotes = ({ noteData, type, getAllNotes, onClose }) => {
       {error && <p className="error-message">{error}</p>}
 
       <button className="btn-primary add-btn" onClick={handleAddNote}>
-        Add Note
+        {type === "edit" ? "Update Note" : "Add Note"}
       </button>
     </div>
   );

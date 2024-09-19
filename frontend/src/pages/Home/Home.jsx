@@ -19,6 +19,10 @@ const Home = () => {
   const [userInfo, setUserInfo] = useState(null);
   const navigate = useNavigate();
 
+  const handleEdit = (noteDetails) => {
+    setOpenAddEditModal({ isShown: true, data: noteDetails, type: "edit" });
+  };
+
   const getUserInfo = async () => {
     try {
       const response = await apiClient.get("/get-user");
@@ -48,9 +52,9 @@ const Home = () => {
   useEffect(() => {
     getAllNotes();
     getUserInfo();
-  
+
     return () => {
-      
+
     }
   }, [])
 
@@ -60,23 +64,23 @@ const Home = () => {
 
       <div className="home-container">
         <div className="note-grid">
-        {allNotes && allNotes.length > 0 ? (
-      allNotes.map((note) => (
-        <NoteCard
-          key={note._id}
-          title={note.title}
-          date={note.createdOn}
-          content={note.content}
-          tags={note.tags.join(", ")}
-          isPinned={note.isPinned}
-          onEdit={() => handleEdit(note)}
-          onDelete={() => handleDelete(note._id)}
-          onPinNote={() => handlePin(note._id)}
-        />
-      ))
-    ) : (
-      <p>No notes available</p>
-    )}
+          {allNotes && allNotes.length > 0 ? (
+            allNotes.map((note) => (
+              <NoteCard
+                key={note._id}
+                title={note.title}
+                date={note.createdOn}
+                content={note.content}
+                tags={note.tags.join(", ")}
+                isPinned={note.isPinned}
+                onEdit={() => handleEdit(note)}
+                onDelete={() => handleDelete(note._id)}
+                onPinNote={() => handlePin(note._id)}
+              />
+            ))
+          ) : (
+            <p>No notes available</p>
+          )}
         </div>
       </div>
 
