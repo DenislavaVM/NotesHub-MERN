@@ -71,6 +71,26 @@ const Home = () => {
     }
   }
 
+  const handleDelete = async (data) => {
+    const noteId = data._id;
+    try {
+      const response = await apiClient.delete("/delete-note/" + noteId);
+
+      if (response.data && !response.data.error) {
+        showNotificationMessage("Note deleted successfully", "delete");
+        getAllNotes();
+      }
+    } catch (error) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        console.log("An unexpexted error accured. Please try again.");
+      }
+    }
+  }
+
   useEffect(() => {
     getAllNotes();
     getUserInfo();
@@ -96,7 +116,7 @@ const Home = () => {
                 tags={note.tags.join(", ")}
                 isPinned={note.isPinned}
                 onEdit={() => handleEdit(note)}
-                onDelete={() => handleDelete(note._id)}
+                onDelete={() => handleDelete(note)}
                 onPinNote={() => handlePin(note._id)}
               />
             ))

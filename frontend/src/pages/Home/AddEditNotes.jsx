@@ -35,7 +35,7 @@ const AddEditNotes = ({ noteData, type, getAllNotes, onClose, showNotificationMe
   };
 
   const editNote = async () => {
-    const noteId = noteData._id
+    const noteId = noteData._id;
     try {
       const response = await apiClient.put("/edit-note/" + noteId, {
         title,
