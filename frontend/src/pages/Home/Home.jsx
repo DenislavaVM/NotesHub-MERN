@@ -7,6 +7,7 @@ import AddEditNotes from "./AddEditNotes";
 import Modal from "react-modal";
 import { useNavigate } from "react-router-dom";
 import apiClient from "../../utils/apiClient";
+import Notification from "../../components/Notification/Notification";
 
 const Home = () => {
   const [openAddEditModel, setOpenAddEditModal] = useState({
@@ -15,12 +16,33 @@ const Home = () => {
     data: null,
   });
 
+  const [showNotificationMsg, setShowNotificationMsg] = useState({
+    isShown: false,
+    message: "",
+    type: "add",
+  });
+
   const [allNotes, setAllNotes] = useState([]);
   const [userInfo, setUserInfo] = useState(null);
   const navigate = useNavigate();
 
   const handleEdit = (noteDetails) => {
     setOpenAddEditModal({ isShown: true, data: noteDetails, type: "edit" });
+  };
+
+  const showNotificationMessage = (message, type) => {
+    setShowNotificationMsg({
+      isShown: true,
+      message: message,
+      type: type,
+    });
+  };
+
+  const handleCloseNotification = () => {
+    setShowNotificationMsg({
+      isShown: false,
+      message: "",
+    });
   };
 
   const getUserInfo = async () => {
@@ -110,8 +132,15 @@ const Home = () => {
             setOpenAddEditModal({ isShown: false, type: "add", data: null })
           }}
           getAllNotes={getAllNotes}
+          showNotificationMessage={showNotificationMessage}
         />
       </Modal>
+      <Notification
+        isShown={showNotificationMsg.isShown}
+        message={showNotificationMsg.message}
+        type={showNotificationMsg.type}
+        onClose={handleCloseNotification}
+      />
     </>
   );
 };

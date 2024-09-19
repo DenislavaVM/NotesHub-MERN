@@ -4,7 +4,7 @@ import TagInput from "../../components/input/TagInput";
 import { MdClose } from "react-icons/md";
 import apiClient from "../../utils/apiClient";
 
-const AddEditNotes = ({ noteData, type, getAllNotes, onClose }) => {
+const AddEditNotes = ({ noteData, type, getAllNotes, onClose, showNotificationMessage }) => {
   const [title, setTitle] = useState(noteData?.title || "");
   const [content, setContent] = useState(noteData?.content || "");
   const [tags, setTags] = useState(noteData?.tags || []);
@@ -19,6 +19,7 @@ const AddEditNotes = ({ noteData, type, getAllNotes, onClose }) => {
       });
 
       if (response.data && response.data.note) {
+        showNotificationMessage("Note added successfully");
         getAllNotes();
         onClose();
       }
@@ -43,6 +44,7 @@ const AddEditNotes = ({ noteData, type, getAllNotes, onClose }) => {
       });
 
       if (response.data && response.data.note) {
+        showNotificationMessage("Note updated successfully");
         getAllNotes();
         onClose();
       }
