@@ -87,11 +87,6 @@ const AddEditNotes = ({ noteData, type, getAllNotes, onClose }) => {
 
       <div className="input-group">
         <label className="input-label">Tags</label>
-        <input
-          type="text"
-          className="input-tags"
-          placeholder="Enter tags separated by commas..."
-        />
         <TagInput tags={tags} setTags={setTags} />
       </div>
 
