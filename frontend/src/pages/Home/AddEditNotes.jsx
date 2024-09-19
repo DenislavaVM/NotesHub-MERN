@@ -2,15 +2,35 @@ import React, { useState } from "react";
 import "./AddEditNotes.css";
 import TagInput from "../../components/input/TagInput";
 import { MdClose } from "react-icons/md";
+import apiClient from "../../utils/apiClient";
 
-const AddEditNotes = ({ noteData, type, onClose }) => {
+const AddEditNotes = ({ noteData, type, getAllNotes, onClose }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [tags, setTags] = useState([]);
   const [error, setError] = useState(null);
 
   const addNewNode = async () => {
-    // Logic to add a new note
+    try {
+      const response = await apiClient.post("/add-note", {
+        title,
+        content,
+        tags,
+      });
+
+      if (response.data && response.data.note) {
+        getAllNotes();
+        onClose();
+      }
+    } catch (error) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        setError(error.response.data.message);
+      }
+    }
   };
 
   const editNote = async () => {
