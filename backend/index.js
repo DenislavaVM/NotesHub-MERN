@@ -76,9 +76,9 @@ app.post("/create-account", async (req, res) => {
         { user: { _id: user._id, firstName: user.firstName, lastName: user.lastName, email: user.email } },
         process.env.ACCESS_TOKEN_SECRET,
         {
-          expiresIn: "36000m",
+            expiresIn: "36000m",
         }
-      );
+    );
 
     return res.json({
         error: false,
@@ -114,7 +114,7 @@ app.post("/login", async (req, res) => {
     if (userInfo.password === password) {
         const user = { _id: userInfo._id, firstName: userInfo.firstName, lastName: userInfo.lastName, email: userInfo.email };
         const accessToken = jwt.sign({ user }, process.env.ACCESS_TOKEN_SECRET, {
-          expiresIn: "36000m",
+            expiresIn: "36000m",
         });
 
         return res.json({ error: false, message: "Login successful", email, accessToken });
@@ -149,7 +149,7 @@ app.get("/get-user", authenticateToken, async (req, res) => {
 
 app.post("/add-note", authenticateToken, async (req, res) => {
     const { title, content, tags } = req.body;
-    const { user } = req.user;
+    const user = req.user;
 
     if (!title) {
         return res
@@ -239,7 +239,6 @@ app.put("/edit-note/:noteId", authenticateToken, async (req, res) => {
 
 app.get("/get-all-notes", authenticateToken, async (req, res) => {
     const user = req.user;
-
     if (!user || !user._id) {
         return res.status(400).json({
             error: true,
