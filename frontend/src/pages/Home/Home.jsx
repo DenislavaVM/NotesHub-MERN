@@ -80,7 +80,7 @@ const Home = () => {
     }
   };
 
-const handleDelete = async (data) => {
+  const handleDelete = async (data) => {
     const noteId = data._id;
     try {
       const response = await apiClient.delete("/delete-note/" + noteId);
@@ -114,93 +114,100 @@ const handleDelete = async (data) => {
     } catch (error) {
       console.log(error);
     }
-  }
-    useEffect(() => {
-      getAllNotes();
-      getUserInfo();
+  };
 
-      return () => {
+  const handleClearSearch = () => {
+    setIsSearch(false);
+    getAllNotes();
+  };
 
-      }
-    }, [])
+  useEffect(() => {
+    getAllNotes();
+    getUserInfo();
+    return () => { }
+  }, [])
 
-    return (
-      <>
-        <Navbar userInfo={userInfo} onSearchNote={onSearchNote} />
+  return (
+    <>
+      <Navbar
+        userInfo={userInfo}
+        onSearchNote={onSearchNote}
+        handleClearSearch={handleClearSearch}
+      />
 
-        <div className="home-container">
-          <div
-            className={`home-container ${allNotes.length === 0 ? "empty" : ""}`}
-          >
-            <div className={`note-grid ${allNotes.length === 0 ? "empty-grid" : ""}`}>
-              {allNotes && allNotes.length > 0 ? (
-                allNotes.map((note) => (
-                  <NoteCard
-                    key={note._id}
-                    title={note.title}
-                    date={note.createdOn}
-                    content={note.content}
-                    tags={note.tags.join(", ")}
-                    isPinned={note.isPinned}
-                    onEdit={() => handleEdit(note)}
-                    onDelete={() => handleDelete(note)}
-                    onPinNote={() => handlePin(note._id)}
-                  />
-                ))
-              ) : (
-                <EmptyCard
-                  imgSrc={AddNotesImg}
-                  message={
-                    "Start creating your first note! Click the 'Add' button to jot down your thoughts, ideas, and reminders. Let's get started!"
-                  }
+      <div className="home-container">
+        <div
+          className={`home-container ${allNotes.length === 0 ? "empty" : ""}`}
+        >
+          <div className={`note-grid ${allNotes.length === 0 ? "empty-grid" : ""}`}>
+            {allNotes && allNotes.length > 0 ? (
+              allNotes.map((note) => (
+                <NoteCard
+                  key={note._id}
+                  title={note.title}
+                  date={note.createdOn}
+                  content={note.content}
+                  tags={note.tags.join(", ")}
+                  isPinned={note.isPinned}
+                  onEdit={() => handleEdit(note)}
+                  onDelete={() => handleDelete(note)}
+                  onPinNote={() => handlePin(note._id)}
                 />
-              )}
-            </div>
+              ))
+            ) : (
+              <EmptyCard
+                imgSrc={AddNotesImg}
+                message={
+                  "Start creating your first note! Click the 'Add' button to jot down your thoughts, ideas, and reminders. Let's get started!"
+                }
+              />
+            )}
           </div>
         </div>
+      </div>
 
-        <button
-          className="add-button"
-          onClick={() => {
-            setOpenAddEditModal({ isShown: true, type: "add", data: null });
-          }}
-        >
-          <MdAdd className="add-icon" />
-        </button>
+      <button
+        className="add-button"
+        onClick={() => {
+          setOpenAddEditModal({ isShown: true, type: "add", data: null });
+        }}
+      >
+        <MdAdd className="add-icon" />
+      </button>
 
-        <Modal
-          isOpen={openAddEditModel.isShown}
-          onRequestClose={() =>
-            setOpenAddEditModal({ isShown: false, type: "", data: null })
-          }
-          style={{
-            overlay: {
-              backgroundColor: "rgba(0,0,0,0.2)",
-            },
+      <Modal
+        isOpen={openAddEditModel.isShown}
+        onRequestClose={() =>
+          setOpenAddEditModal({ isShown: false, type: "", data: null })
+        }
+        style={{
+          overlay: {
+            backgroundColor: "rgba(0,0,0,0.2)",
+          },
+        }}
+        className="modal-content"
+      >
+        <AddEditNotes
+          type={openAddEditModel.type}
+          noteData={openAddEditModel.data}
+          onClose={() => {
+            setOpenAddEditModal({
+              isShown: false,
+              type: "add",
+              data: null,
+            });
           }}
-          className="modal-content"
-        >
-          <AddEditNotes
-            type={openAddEditModel.type}
-            noteData={openAddEditModel.data}
-            onClose={() => {
-              setOpenAddEditModal({
-                isShown: false,
-                type: "add",
-                data: null,
-              });
-            }}
-            getAllNotes={getAllNotes}
-            showNotificationMessage={showNotificationMessage}
-          />
-        </Modal>
-        <Notification
-          isShown={showNotificationMsg.isShown}
-          message={showNotificationMsg.message}
-          type={showNotificationMsg.type}
-          onClose={handleCloseNotification}
+          getAllNotes={getAllNotes}
+          showNotificationMessage={showNotificationMessage}
         />
-      </>
-    );
-  };
+      </Modal>
+      <Notification
+        isShown={showNotificationMsg.isShown}
+        message={showNotificationMsg.message}
+        type={showNotificationMsg.type}
+        onClose={handleCloseNotification}
+      />
+    </>
+  );
+};
 export default Home;
