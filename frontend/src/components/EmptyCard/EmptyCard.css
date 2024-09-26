@@ -1,0 +1,24 @@
+@import "../../variables.css";
+
+.empty-card-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.empty-card-container img {
+  width: 220px;
+  margin-bottom: 20px;
+}
+
+.empty-card-message {
+  font-size: 1.25rem;
+  color: #4a5568;
+  line-height: 1.6;
+  max-width: 600px;
+  padding: 0 20px;
+}
