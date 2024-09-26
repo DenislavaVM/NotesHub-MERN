@@ -117,6 +117,23 @@ const Home = () => {
     }
   };
 
+  const handlePin = async (noteData) => {
+    const noteId = noteData._id;
+    try {
+      const response = await apiClient.put("/update-note-pinned/" + noteId, {
+        "isPinned": !noteData.isPinned
+      });
+
+      if (response.data && response.data.note) {
+        showNotificationMessage("Note updated successfully");
+        getAllNotes();
+      }
+    } catch (error) {
+      console.log(error);
+
+    }
+  };
+
   const handleClearSearch = () => {
     setIsSearch(false);
     getAllNotes();
@@ -152,7 +169,7 @@ const Home = () => {
                   isPinned={note.isPinned}
                   onEdit={() => handleEdit(note)}
                   onDelete={() => handleDelete(note)}
-                  onPinNote={() => handlePin(note._id)}
+                  onPinNote={() => handlePin(note)}
                 />
               ))
             ) : (
