@@ -10,6 +10,7 @@ import apiClient from "../../utils/apiClient";
 import Notification from "../../components/Notification/Notification";
 import EmptyCard from "../../components/EmptyCard/EmptyCard";
 import AddNotesImg from "../../assets/images/add-notes.svg";
+import NoDataImg from "../../assets/images/no-data.svg";
 
 const Home = () => {
   const [openAddEditModel, setOpenAddEditModal] = useState({
@@ -156,9 +157,11 @@ const Home = () => {
               ))
             ) : (
               <EmptyCard
-                imgSrc={AddNotesImg}
+                imgSrc={isSearch ? NoDataImg : AddNotesImg}
                 message={
-                  "Start creating your first note! Click the 'Add' button to jot down your thoughts, ideas, and reminders. Let's get started!"
+                  isSearch
+                    ? "Oops! No notes found matching your search."
+                    : "Start creating your first note! Click the 'Add' button to jot down your thoughts, ideas, and reminders. Let's get started!"
                 }
               />
             )}
