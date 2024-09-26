@@ -14,6 +14,9 @@ const app = express();
 const jwt = require("jsonwebtoken");
 const { authenticateToken } = require("./utils");
 
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
+
 app.use(express.json());
 
 app.use(
@@ -63,11 +66,13 @@ app.post("/create-account", async (req, res) => {
         });
     }
 
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
     const user = new User({
         firstName,
         lastName,
         email,
-        password,
+        password: hashedPassword,
     });
 
     await user.save();
@@ -111,7 +116,9 @@ app.post("/login", async (req, res) => {
             .json({ message: "User not found" })
     }
 
-    if (userInfo.password === password) {
+    const isPasswordValid = await bcrypt.compare(password, userInfo.password);
+
+    if (isPasswordValid) {
         const user = { _id: userInfo._id, firstName: userInfo.firstName, lastName: userInfo.lastName, email: userInfo.email };
         const accessToken = jwt.sign({ user }, process.env.ACCESS_TOKEN_SECRET, {
             expiresIn: "36000m",
