@@ -336,8 +336,6 @@ app.get("/search-notes", authenticateToken, async (req, res) => {
     }
 
     try {
-        console.log("Searching Notes in DB...");
-
         const matchingNotes = await Note.find({
             userId: user._id,
             $or: [
