@@ -8,6 +8,8 @@ import Modal from "react-modal";
 import { useNavigate } from "react-router-dom";
 import apiClient from "../../utils/apiClient";
 import Notification from "../../components/Notification/Notification";
+import EmptyCard from "../../components/EmptyCard/EmptyCard";
+import AddNotesImg from "../../assets/images/add-notes.svg";
 
 const Home = () => {
   const [openAddEditModel, setOpenAddEditModal] = useState({
@@ -105,24 +107,33 @@ const Home = () => {
       <Navbar userInfo={userInfo} />
 
       <div className="home-container">
-        <div className="note-grid">
-          {allNotes && allNotes.length > 0 ? (
-            allNotes.map((note) => (
-              <NoteCard
-                key={note._id}
-                title={note.title}
-                date={note.createdOn}
-                content={note.content}
-                tags={note.tags.join(", ")}
-                isPinned={note.isPinned}
-                onEdit={() => handleEdit(note)}
-                onDelete={() => handleDelete(note)}
-                onPinNote={() => handlePin(note._id)}
+        <div
+          className={`home-container ${allNotes.length === 0 ? "empty" : ""}`}
+        >
+          <div className={`note-grid ${allNotes.length === 0 ? "empty-grid" : ""}`}>
+            {allNotes && allNotes.length > 0 ? (
+              allNotes.map((note) => (
+                <NoteCard
+                  key={note._id}
+                  title={note.title}
+                  date={note.createdOn}
+                  content={note.content}
+                  tags={note.tags.join(", ")}
+                  isPinned={note.isPinned}
+                  onEdit={() => handleEdit(note)}
+                  onDelete={() => handleDelete(note)}
+                  onPinNote={() => handlePin(note._id)}
+                />
+              ))
+            ) : (
+              <EmptyCard
+                imgSrc={AddNotesImg}
+                message={
+                  "Start creating your first note! Click the 'Add' button to jot down your thoughts, ideas, and reminders. Let's get started!"
+                }
               />
-            ))
-          ) : (
-            <p>No notes available</p>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
@@ -137,7 +148,9 @@ const Home = () => {
 
       <Modal
         isOpen={openAddEditModel.isShown}
-        onRequestClose={() => setOpenAddEditModal({ isShown: false, type: "", data: null })}
+        onRequestClose={() =>
+          setOpenAddEditModal({ isShown: false, type: "", data: null })
+        }
         style={{
           overlay: {
             backgroundColor: "rgba(0,0,0,0.2)",
@@ -149,7 +162,11 @@ const Home = () => {
           type={openAddEditModel.type}
           noteData={openAddEditModel.data}
           onClose={() => {
-            setOpenAddEditModal({ isShown: false, type: "add", data: null })
+            setOpenAddEditModal({
+              isShown: false,
+              type: "add",
+              data: null,
+            });
           }}
           getAllNotes={getAllNotes}
           showNotificationMessage={showNotificationMessage}
@@ -164,5 +181,4 @@ const Home = () => {
     </>
   );
 };
-
 export default Home;

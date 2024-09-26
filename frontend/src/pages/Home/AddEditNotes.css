@@ -1,103 +1,107 @@
 .add-edit-notes-container {
-    display: flex;
-    flex-direction: column;
-    padding: 2rem;
-    background-color: #ffffff;
-    border-radius: 20px;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 600px;
-    margin: 2rem auto;
-    position: relative;
-  }
-  
-  .input-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  
-  .input-label {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #374151;
-  }
-  
-  .input-title,
-  .textarea-content,
-  .input-tags {
-    font-size: 1rem;
-    color: #1f2937;
-    outline: none;
-    border: 1px solid #e5e7eb;
-    padding: 0.75rem;
-    border-radius: 6px;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  }
-  
-  .input-title:focus,
-  .textarea-content:focus,
-  .input-tags:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-  }
-  
-  .textarea-content {
-    resize: none;
-    height: 150px;
-  }
-  
-  .add-btn {
-    font-weight: 600;
-    padding: 0.75rem;
-    background-color: #3b82f6;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    margin-top: 1rem;
-    align-self: center;
-    width: 100%;
-    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
-  }
-  
-  .add-btn:hover {
-    background-color: #2563eb;
-    transform: translateY(-2px);
-  }
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  background-color: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 600px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  overflow-y: auto;
+  z-index: 1000;
+}
 
-  .add-btn:active {
-    background-color: #1d4ed8;
-    transform: translateY(0);
-  }
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
 
-  .close-button {
-    width: 2.5rem;
-    height: 2.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: absolute;
-    top: 0.5rem; 
-    right: 0.5rem;
-    border-radius: 50%;
-    background-color: transparent;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .close-button:hover {
-    background-color: #f8fafc;
-  }
-  
-  .close-icon {
-    font-size: 1.25rem;
-    color: #94a3b8;
-  }
-  
-  .error-message {
-    color: #ef4444;
-    font-size: 0.75rem;
-    padding-top: 1rem;
-  }
+.input-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.input-title,
+.textarea-content,
+.input-tags {
+  font-size: 1rem;
+  color: #1f2937;
+  outline: none;
+  border: 1px solid #e5e7eb;
+  padding: 0.75rem;
+  border-radius: 6px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.input-title:focus,
+.textarea-content:focus,
+.input-tags:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.textarea-content {
+  resize: none;
+  height: 150px;
+}
+
+.add-btn {
+  font-weight: 600;
+  padding: 0.75rem;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  margin-top: 1rem;
+  align-self: center;
+  width: 100%;
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+}
+
+.add-btn:hover {
+  background-color: #2563eb;
+  transform: translateY(-2px);
+}
+
+.add-btn:active {
+  background-color: #1d4ed8;
+  transform: translateY(0);
+}
+
+.close-button {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  border-radius: 50%;
+  background-color: transparent;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.close-button:hover {
+  background-color: #f8fafc;
+}
+
+.close-icon {
+  font-size: 1.25rem;
+  color: #94a3b8;
+}
+
+.error-message {
+  color: #ef4444;
+  font-size: 0.75rem;
+  padding-top: 1rem;
+}

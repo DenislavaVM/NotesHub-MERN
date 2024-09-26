@@ -1,9 +1,11 @@
+@import "../../variables.css";
+
 .navbar {
   background-color: white;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 2rem;
+  padding: 1.5rem 2rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   position: sticky;
   top: 0;
@@ -14,15 +16,8 @@
 .navbar-title {
   font-size: 1.75rem;
   font-weight: bold;
-  color: #111827;
-  margin-right: auto;
-}
-
-.navbar-left {
-  display: flex;
-  align-items: center;
-  flex: 1;
-  justify-content: flex-start;
+  color: var(--font-color);
+  margin-right: 2rem;
 }
 
 .navbar-center {
@@ -37,7 +32,6 @@
   display: flex;
   align-items: center;
   flex: 1;
- 
   justify-content: flex-end;
   position: relative;
 }
@@ -50,31 +44,24 @@
 .profile-info-container {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 0.5rem 1rem;
+  gap: 1.5rem;
+  padding: 1rem 1.5rem;
   background-color: #ffffff;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-@media screen and (max-width: 600px) {
+@media (max-width: 600px) {
   .navbar {
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
     justify-content: space-between; 
     padding: 1rem;
   }
 
-  .navbar-left {
-    display: flex;
-    align-items: center;
-    flex: 1;
-  }
   .navbar-title {
     font-size: 1.5rem;
     text-align: left; 
-    margin: 0;
   }
 
   .navbar-center {
@@ -85,15 +72,11 @@
   }
 
   .navbar-right {
-    display: flex;
-    align-items: center;
-    flex: 1;
     justify-content: flex-start;
-    margin-left: 0;
     order: 1;
   }
 
-.profile-info-container {
-  position: static;
+  .profile-info-container {
+    position: static;
   }
 }

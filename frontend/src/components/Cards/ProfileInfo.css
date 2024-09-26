@@ -1,3 +1,5 @@
+@import "../../variables.css";
+
 .profile-info-container {
   display: flex;
   align-items: center;
@@ -14,14 +16,11 @@
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  color: #ffffff;
+  color: #fff;
   font-weight: 700;
   background: linear-gradient(135deg, #ff7e5f, #feb47b);
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  overflow: hidden;
-  text-align: center;
-  line-height: 1;
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -35,21 +34,19 @@
 .profile-name {
   font-size: 1rem;
   font-weight: 600;
-  color: #111827;
-  margin-bottom: 0.25rem;
+  color: var(--font-color);
 }
 
 .logout-button {
   font-size: 0.875rem;
-  color: #3b82f6;
-  text-decoration: none;
+  color: var(--primary-color);
   background: none;
   border: none;
   cursor: pointer;
-  transition: color 0.3s ease, text-decoration 0.3s ease;
+  transition: color 0.3s ease;
 }
 
 .logout-button:hover {
-  color: #1d4ed8;
+  color: var(--secondary-color);
   text-decoration: underline;
 }

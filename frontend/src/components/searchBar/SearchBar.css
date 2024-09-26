@@ -1,3 +1,5 @@
+@import "../../variables.css";
+
 .search-bar-container {
   display: flex;
   align-items: center;
@@ -19,7 +21,7 @@
 }
 
 .search-bar-input:focus {
-  border-color: #3b82f6;
+  border-color:  var(--primary-color);
   background-color: #ffffff;
 }
 
@@ -37,7 +39,7 @@
 }
 
 .search-bar-button {
-  background-color: #3b82f6;
+  background-color:  var(--primary-color);
   color: white;
   margin-right: 0.5rem;
 }
@@ -52,7 +54,7 @@
 }
 
 .search-bar-button:hover {
-  background-color: #2563eb;
+  background-color: var(--secondary-color);
   transform: translateY(-2px);
 }
 

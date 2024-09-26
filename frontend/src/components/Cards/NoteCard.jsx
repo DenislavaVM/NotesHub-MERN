@@ -26,26 +26,36 @@ const NoteCard = ({
                 <MdOutlinePushPin
                     className={`icon-btn ${isPinned ? "pinned" : "unpinned"}`}
                     onClick={onPinNote}
+                    title={isPinned ? "Unpin Note" : "Pin Note"}
                 />
             </div>
-            <p className="note-content">{(content || "").slice(0, 60)}</p>
+            <p className="note-content">
+                {content && content.length > 60 
+                  ? content.slice(0, 60) + "..." 
+                  : content
+                }
+            </p>
             <div className="note-footer">
                 <div className="note-tags">
-                    {(Array.isArray(formattedTags) ? formattedTags : []).map((item) => `#${item}, `)}
+                    {(Array.isArray(formattedTags) ? formattedTags : []).map((item, index) => (
+                        <span key={index}>#{item}</span>
+                    ))}
                 </div>
                 <div className="note-actions">
                     <MdCreate
                         className="icon-btn edit-btn"
                         onClick={onEdit}
+                        title="Edit Note"
                     />
                     <MdDelete
                         className="icon-btn delete-btn"
                         onClick={onDelete}
+                        title="Delete Note"
                     />
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default NoteCard;

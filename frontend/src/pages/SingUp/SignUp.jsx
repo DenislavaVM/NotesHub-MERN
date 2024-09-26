@@ -83,7 +83,6 @@ const SignUp = () => {
                 onChange={(e) => setFirstName(e.target.value)}
                 aria-label="First name"
               />
-              {error.firstName && <span className="error-icon">!</span>}
               {error.firstName && <p className="error-message">{error.firstName}</p>}
             </div>
 
@@ -97,7 +96,6 @@ const SignUp = () => {
                 onChange={(e) => setLastName(e.target.value)}
                 aria-label="Last name"
               />
-              {error.lastName && <span className="error-icon">!</span>}
               {error.lastName && <p className="error-message">{error.lastName}</p>}
             </div>
 
@@ -111,7 +109,6 @@ const SignUp = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 aria-label="Email"
               />
-              {error.email && <span className="error-icon">!</span>}
               {error.email && <p className="error-message">{error.email}</p>}
             </div>
 
@@ -121,7 +118,6 @@ const SignUp = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
               />
-              {error.password && <span className="error-icon">!</span>}
               {error.password && <p className="error-message">{error.password}</p>}
             </div>
 
