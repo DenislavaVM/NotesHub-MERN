@@ -365,6 +365,116 @@ app.get("/search-notes", authenticateToken, async (req, res) => {
     }
 });
 
+app.put("/archive-note/:noteId", authenticateToken, async (req, res) => {
+    const noteId = req.params.noteId;
+    const { isArchived } = req.body;
+    const user = req.user;
+
+    try {
+        const note = await Note.findOne({ _id: noteId, userId: user._id });
+
+        if (!note) {
+            return res.status(404).json({ error: true, message: "Note not found" });
+        }
+
+        note.isArchived = isArchived;
+        await note.save();
+
+        return res.json({
+            error: false,
+            note,
+            message: isArchived ? "Note archived successfully" : "Note unarchived successfully",
+        });
+    } catch (error) {
+        return res.status(500).json({ error: true, message: "Internal server error" });
+    }
+});
+
+app.put("/complete-note/:noteId", authenticateToken, async (req, res) => {
+    const noteId = req.params.noteId;
+    const { isCompleted } = req.body;
+    const user = req.user;
+
+    try {
+        const note = await Note.findOne({ _id: noteId, userId: user._id });
+
+        if (!note) {
+            return res.status(404).json({ error: true, message: "Note not found" });
+        }
+
+        note.isCompleted = isCompleted;
+        await note.save();
+
+        return res.json({
+            error: false,
+            note,
+            message: isCompleted ? "Note marked as completed" : "Note marked as incomplete",
+        });
+    } catch (error) {
+        return res.status(500).json({ error: true, message: "Internal server error" });
+    }
+});
+
+app.put("/add-label/:noteId", authenticateToken, async (req, res) => {
+    const noteId = req.params.noteId;
+    const { label } = req.body;
+    const user = req.user;
+
+    if (!label || label.trim() === "") {
+        return res.status(400).json({ error: true, message: "Label is required" });
+    }
+
+    try {
+        const note = await Note.findOne({ _id: noteId, userId: user._id });
+
+        if (!note) {
+            return res.status(404).json({ error: true, message: "Note not found" });
+        }
+
+        if (!note.tags.includes(label)) {
+            note.tags.push(label);
+            await note.save();
+        }
+
+        return res.json({
+            error: false,
+            note,
+            message: "Label added successfully",
+        });
+    } catch (error) {
+        return res.status(500).json({ error: true, message: "Internal server error" });
+    }
+});
+
+app.put("/remove-label/:noteId", authenticateToken, async (req, res) => {
+    const noteId = req.params.noteId;
+    const { label } = req.body;
+    const user = req.user;
+
+    if (!label || label.trim() === "") {
+        return res.status(400).json({ error: true, message: "Label is required" });
+    }
+
+    try {
+        const note = await Note.findOne({ _id: noteId, userId: user._id });
+
+        if (!note) {
+            return res.status(404).json({ error: true, message: "Note not found" });
+        }
+
+        note.tags = note.tags.filter((tag) => tag !== label);
+        await note.save();
+
+        return res.json({
+            error: false,
+            note,
+            message: "Label removed successfully",
+        });
+    } catch (error) {
+        return res.status(500).json({ error: true, message: "Internal server error" });
+    }
+});
+
 app.listen(3000, () => console.log("Server started on port 3000"));
 
 module.exports = app;

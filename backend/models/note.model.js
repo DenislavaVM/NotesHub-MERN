@@ -9,6 +9,8 @@ const noteSchema = new Schema({
     isPinned: { type: Boolean, required: false },
     userId: { type: String, required: true },
     createdOn: { type: Date, default: Date.now },
+    isArchived: { type: Boolean, default: false },
+    isCompleted: { type: Boolean, default: false },
 });
 
 module.exports = mongoose.model("Note", noteSchema);
