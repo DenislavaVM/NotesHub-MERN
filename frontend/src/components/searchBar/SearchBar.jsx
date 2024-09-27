@@ -12,10 +12,6 @@ const SearchBar = ({ value, onChange, handleSearch, onClearSearch, setTags, setS
         value={value}
         onChange={onChange}
       />
-      <button className="search-bar-button" onClick={handleSearch}>
-        <FaSearch className="search-icon" />
-      </button>
-
       <input
         type="text"
         placeholder="Enter tags (comma separated)"
@@ -33,9 +29,16 @@ const SearchBar = ({ value, onChange, handleSearch, onClearSearch, setTags, setS
         <option value="updated">Updated Date</option>
       </select>
 
-      <button className="clear-button" onClick={onClearSearch}>
-        Clear
-      </button>
+      <div className="search-bar-buttons">
+        <button className="search-bar-button" onClick={handleSearch}>
+          <FaSearch className="search-icon" />
+        </button>
+
+        <button className="clear-button" onClick={onClearSearch}>
+          Clear
+        </button>
+      </div>
+
     </div>
   );
 };
