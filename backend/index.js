@@ -247,6 +247,8 @@ app.put("/edit-note/:noteId", authenticateToken, async (req, res) => {
 
 app.get("/get-all-notes", authenticateToken, async (req, res) => {
     const user = req.user;
+    const { searchQuery, tags, sortBy } = req.query;
+
     if (!user || !user._id) {
         return res.status(400).json({
             error: true,
@@ -255,7 +257,27 @@ app.get("/get-all-notes", authenticateToken, async (req, res) => {
     }
 
     try {
-        const notes = await Note.find({ userId: user._id }).sort({ isPinned: -1 });
+        let filter = { userId: user._id };
+
+        if (searchQuery) {
+            filter.$or = [
+                { title: { $regex: new RegExp(searchQuery, "i") } },
+                { content: { $regex: new RegExp(searchQuery, "i") } }
+            ];
+        }
+
+        if (tags) {
+            filter.tags = { $in: tags.split(",") };
+        }
+
+        let sortOptions = { isPinned: -1 };
+        if (sortBy === "created") {
+            sortOptions = { createdOn: -1 };
+        } else if (sortBy === "updated") {
+            sortOptions = { updatedOn: -1 };
+        }
+
+        const notes = await Note.find(filter).sort(sortOptions);
 
         return res.json({
             error: false,

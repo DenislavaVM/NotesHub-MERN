@@ -4,14 +4,14 @@ import ProfileInfo from "../Cards/ProfileInfo";
 import { useNavigate } from "react-router-dom";
 import SearchBar from "../searchBar/SearchBar";
 
-const Navbar = ({userInfo, onSearchNote, handleClearSearch }) => {
+const Navbar = ({ userInfo, onSearchNote, handleClearSearch, setTags, setSortBy }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
   const onLogout = () => {
     localStorage.clear();
-    navigate("/login")
-  }
+    navigate("/login");
+  };
 
   const handleSearch = () => {
     if (searchQuery) {
@@ -32,9 +32,11 @@ const Navbar = ({userInfo, onSearchNote, handleClearSearch }) => {
       <div className="navbar-center">
         <SearchBar
           value={searchQuery}
-          onChange={({ target }) => setSearchQuery(target.value)}
+          onChange={(e) => setSearchQuery(e.target.value)}
           handleSearch={handleSearch}
           onClearSearch={onClearSearch}
+          setTags={setTags}
+          setSortBy={setSortBy}
         />
       </div>
       <div className="navbar-right">

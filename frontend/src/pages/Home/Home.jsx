@@ -28,6 +28,9 @@ const Home = () => {
   const [allNotes, setAllNotes] = useState([]);
   const [userInfo, setUserInfo] = useState(null);
   const [isSearch, setIsSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [tags, setTags] = useState([]);
+  const [sortBy, setSortBy] = useState("");
   const navigate = useNavigate();
 
   const handleEdit = (noteDetails) => {
@@ -63,22 +66,27 @@ const Home = () => {
     }
   };
 
-  const getAllNotes = async (notes = null) => {
-
-    if (notes) {
-      setAllNotes(notes);
-      return;
-    }
-
+  const getAllNotes = async () => {
     try {
-      const response = await apiClient.get("/get-all-notes");
+      const response = await apiClient.get("/get-all-notes", {
+        params: {
+          searchQuery,
+          tags: tags.join(","),
+          sortBy
+        },
+      });
 
       if (response.data && response.data.notes) {
         setAllNotes(response.data.notes);
       }
     } catch (error) {
-      console.log("An unexpexted error accured. Please try again.");
+      console.log("An unexpected error occurred. Please try again.");
     }
+  };
+
+  const handleSearch = (query) => {
+    setIsSearch(true);
+    setSearchQuery(query);
   };
 
   const handleDelete = async (data) => {
@@ -91,29 +99,9 @@ const Home = () => {
         getAllNotes();
       }
     } catch (error) {
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message
-      ) {
-        console.log("An unexpexted error accured. Please try again.");
+      if (error.response && error.response.data && error.response.data.message) {
+        console.log("An unexpected error occurred. Please try again.");
       }
-    }
-  };
-
-  const onSearchNote = async (query) => {
-    try {
-      const response = await apiClient.get("/search-notes", {
-        params: { query },
-      });
-
-      if (response.data && response.data.notes) {
-        setIsSearch(true);
-        setAllNotes(response.data.notes);
-      }
-
-    } catch (error) {
-      console.log(error);
     }
   };
 
@@ -121,7 +109,7 @@ const Home = () => {
     const noteId = noteData._id;
     try {
       const response = await apiClient.put("/update-note-pinned/" + noteId, {
-        "isPinned": !noteData.isPinned
+        isPinned: !noteData.isPinned,
       });
 
       if (response.data && response.data.note) {
@@ -130,27 +118,30 @@ const Home = () => {
       }
     } catch (error) {
       console.log(error);
-
     }
   };
 
   const handleClearSearch = () => {
     setIsSearch(false);
+    setSearchQuery("");
+    setTags([]);
     getAllNotes();
   };
 
   useEffect(() => {
     getAllNotes();
     getUserInfo();
-    return () => { }
-  }, [])
+    return () => { };
+  }, [searchQuery, tags, sortBy]);
 
   return (
     <>
       <Navbar
         userInfo={userInfo}
-        onSearchNote={onSearchNote}
+        onSearchNote={handleSearch}
         handleClearSearch={handleClearSearch}
+        setTags={setTags}
+        setSortBy={setSortBy}
       />
 
       <div className="home-container">
@@ -230,4 +221,5 @@ const Home = () => {
     </>
   );
 };
+
 export default Home;
