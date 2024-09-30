@@ -13,10 +13,8 @@ const Navbar = ({ userInfo, onSearchNote, handleClearSearch, setTags, setSortBy 
     navigate("/login");
   };
 
-  const handleSearch = () => {
-    if (searchQuery) {
-      onSearchNote(searchQuery);
-    }
+  const handleSearch = (searchQuery, tagsArray) => {
+    onSearchNote(searchQuery, tagsArray);
   };
 
   const onClearSearch = () => {

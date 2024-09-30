@@ -1,8 +1,32 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import "./SearchBar.css";
 
-const SearchBar = ({ value, onChange, handleSearch, onClearSearch, setTags, setSortBy }) => {
+const SearchBar = ({ value, onChange, handleSearch, onClearSearch, setSortBy }) => {
+  const [tagInput, setTagInput] = useState("");
+
+  const handleSearchClick = () => {
+    const searchQuery = value;
+    const tagsArray = tagInput
+      .split(",")
+      .map(tag => tag.trim())
+      .filter(tag => tag !== "");
+
+    handleSearch(searchQuery, tagsArray);
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleSearchClick();
+    }
+  };
+
+  const handleClearClick = () => {
+    setTagInput("");
+    onChange({ target: { value: "" } });
+    onClearSearch();
+  };
+
   return (
     <div className="search-bar-container">
       <input
@@ -11,16 +35,15 @@ const SearchBar = ({ value, onChange, handleSearch, onClearSearch, setTags, setS
         className="search-bar-input"
         value={value}
         onChange={onChange}
+        onKeyDown={handleKeyPress}
       />
       <input
         type="text"
         placeholder="Enter tags (comma separated)"
         className="tag-input"
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            setTags(e.target.value.split(",").map(tag => tag.trim()));
-          }
-        }}
+        value={tagInput}
+        onChange={(e) => setTagInput(e.target.value)}
+        onKeyDown={handleKeyPress}
       />
 
       <select className="sort-select" onChange={(e) => setSortBy(e.target.value)}>
@@ -30,11 +53,11 @@ const SearchBar = ({ value, onChange, handleSearch, onClearSearch, setTags, setS
       </select>
 
       <div className="search-bar-buttons">
-        <button className="search-bar-button" onClick={handleSearch}>
+        <button className="search-bar-button" onClick={handleSearchClick}>
           <FaSearch className="search-icon" />
         </button>
 
-        <button className="clear-button" onClick={onClearSearch}>
+        <button className="clear-button" onClick={handleClearClick}>
           Clear
         </button>
       </div>

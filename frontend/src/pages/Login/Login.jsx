@@ -55,21 +55,21 @@ const Login = () => {
         <div className="login-form">
           <h4 className="login-title">Login</h4>
           <form onSubmit={handleLogin}>
-            <input 
+            <input
               id="email"
-              type="text" 
-              placeholder="Email" 
+              type="text"
+              placeholder="Email"
               className="input-box"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               aria-label="Email"
             />
-              <PasswordInput
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-              />
-               {error && <p className="error-message">{error}</p>}
+            <PasswordInput
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+            />
+            {error && <p className="error-message">{error}</p>}
             <button type="submit" className="btn-primary">Login</button>
           </form>
           <p className="register-prompt">

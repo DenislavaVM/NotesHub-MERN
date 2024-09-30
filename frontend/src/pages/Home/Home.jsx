@@ -67,26 +67,32 @@ const Home = () => {
   };
 
   const getAllNotes = async () => {
+    const validTags = Array.isArray(tags) ? tags : [];
+  
     try {
       const response = await apiClient.get("/get-all-notes", {
         params: {
-          searchQuery,
-          tags: tags.join(","),
-          sortBy
+          searchQuery: searchQuery || "",
+          tags: validTags.length > 0 ? validTags.join(",") : "",
+          sortBy: sortBy || "",
         },
       });
-
+  
       if (response.data && response.data.notes) {
         setAllNotes(response.data.notes);
+      } else {
+        throw new Error("Unexpected response format");
       }
     } catch (error) {
       console.log("An unexpected error occurred. Please try again.");
     }
   };
 
-  const handleSearch = (query) => {
+  const handleSearch = (searchQuery, tagsArray) => {
+    setSearchQuery(searchQuery);
+    setTags(tagsArray || []);
     setIsSearch(true);
-    setSearchQuery(query);
+    getAllNotes();
   };
 
   const handleDelete = async (data) => {
@@ -117,7 +123,7 @@ const Home = () => {
         getAllNotes();
       }
     } catch (error) {
-      console.log(error);
+      console.log("An unexpected error occurred. Please try again.");
     }
   };
 
@@ -130,8 +136,6 @@ const Home = () => {
 
   useEffect(() => {
     getAllNotes();
-    getUserInfo();
-    return () => { };
   }, [searchQuery, tags, sortBy]);
 
   return (
