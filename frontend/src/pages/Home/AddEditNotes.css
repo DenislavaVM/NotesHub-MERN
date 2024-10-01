@@ -105,3 +105,14 @@
   font-size: 0.75rem;
   padding-top: 1rem;
 }
+
+@media (max-width: 768px) {
+  .add-edit-notes-container {
+    width: 90%;
+    max-width: 400px;
+  }
+
+  .input-group {
+    gap: 0.25rem;
+  }
+}

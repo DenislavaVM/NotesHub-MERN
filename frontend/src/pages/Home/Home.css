@@ -26,3 +26,25 @@
   height: calc(100vh - 200px);
   padding: 0;
 }
+
+@media (max-width: 768px) {
+  .note-grid {
+    grid-template-columns: 1fr;
+    padding: 0.5rem;
+  }
+
+  .home-container {
+    padding: 0 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .note-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .home-container {
+    padding: 0 0.5rem;
+  }
+}
