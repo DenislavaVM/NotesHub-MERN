@@ -8,6 +8,7 @@ const AddEditNotes = ({ noteData, type, getAllNotes, onClose, showNotificationMe
   const [title, setTitle] = useState(noteData?.title || "");
   const [content, setContent] = useState(noteData?.content || "");
   const [tags, setTags] = useState(noteData?.tags || []);
+  const [reminder, setReminder] = useState(noteData?.reminder || "");
   const [error, setError] = useState(null);
 
   const addNewNode = async () => {
@@ -16,6 +17,7 @@ const AddEditNotes = ({ noteData, type, getAllNotes, onClose, showNotificationMe
         title,
         content,
         tags,
+        reminder,
       });
 
       if (response.data && response.data.note) {
@@ -36,12 +38,13 @@ const AddEditNotes = ({ noteData, type, getAllNotes, onClose, showNotificationMe
 
   const editNote = async () => {
     const noteId = noteData._id;
-    
+
     try {
       const response = await apiClient.put("/edit-note/" + noteId, {
         title,
         content,
         tags,
+        reminder,
       });
 
       if (response.data && response.data.note) {
@@ -111,6 +114,15 @@ const AddEditNotes = ({ noteData, type, getAllNotes, onClose, showNotificationMe
       <div className="input-group">
         <label className="input-label">Tags</label>
         <TagInput tags={tags} setTags={setTags} />
+      </div>
+
+      <div className="input-group">
+        <label className="input-label">Set Reminder</label>
+        <input
+          type="datetime-local"
+          value={reminder}
+          onChange={({ target }) => setReminder(target.value)}
+        />
       </div>
 
       {error && <p className="error-message">{error}</p>}

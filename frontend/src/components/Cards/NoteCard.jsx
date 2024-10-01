@@ -9,12 +9,13 @@ const NoteCard = ({
     content,
     tags,
     isPinned,
+    reminder,
     onEdit,
     onDelete,
     onPinNote
 }) => {
     const formattedTags = typeof tags === "string" ? tags.split(",") : tags;
-    
+
     return (
         <div className="note-card">
             <div className="note-card-header">
@@ -30,12 +31,17 @@ const NoteCard = ({
                 />
             </div>
             <p className="note-content">
-                {content && content.length > 60 
-                  ? content.slice(0, 60) + "..." 
-                  : content
+                {content && content.length > 60
+                    ? content.slice(0, 60) + "..."
+                    : content
                 }
             </p>
             <div className="note-footer">
+                {reminder && (
+                    <div className="note-reminder">
+                        Reminder: {moment(reminder).format("Do MMM YYYY, h:mm A")}
+                    </div>
+                )}
                 <div className="note-tags">
                     {(Array.isArray(formattedTags) ? formattedTags : []).map((item, index) => (
                         <span key={index}>#{item}</span>

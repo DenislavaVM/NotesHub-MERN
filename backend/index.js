@@ -196,10 +196,12 @@ app.post("/add-note", authenticateToken, async (req, res) => {
 
 app.put("/edit-note/:noteId", authenticateToken, async (req, res) => {
     const noteId = req.params.noteId;
-    const { title, content, tags, isPinned } = req.body;
+    const { title, content, tags, reminder, isPinned } = req.body;
+
+    console.log("Request Body:", req.body);  // Logs the request body to the console
     const user = req.user;
 
-    if (!title && !content && !tags) {
+    if (!title && !content && !tags && typeof isPinned === 'undefined' && !reminder) {
         return res
             .status(400)
             .json({ error: false, message: "No changes provided" });
@@ -224,6 +226,10 @@ app.put("/edit-note/:noteId", authenticateToken, async (req, res) => {
 
         if (tags && Array.isArray(tags)) {
             note.tags = tags;
+        }
+
+        if (reminder !== undefined && reminder !== null && reminder !== '') {
+            note.reminder = reminder;
         }
 
         if (isPinned) {
@@ -493,6 +499,27 @@ app.put("/remove-label/:noteId", authenticateToken, async (req, res) => {
             note,
             message: "Label removed successfully",
         });
+    } catch (error) {
+        return res.status(500).json({ error: true, message: "Internal server error" });
+    }
+});
+
+app.put("/set-reminder/:noteId", authenticateToken, async (req, res) => {
+    const noteId = req.params.noteId;
+    const { reminder } = req.body;
+    const user = req.user;
+
+    try {
+        const note = await Note.findOne({ _id: noteId, userId: user._id });
+
+        if (!note) {
+            return res.status(404).json({ error: true, message: "Note not found" });
+        }
+
+        note.reminder = reminder;
+        await note.save();
+
+        return res.json({ error: false, note, message: "Reminder set successfully" });
     } catch (error) {
         return res.status(500).json({ error: true, message: "Internal server error" });
     }

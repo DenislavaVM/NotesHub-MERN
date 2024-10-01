@@ -12,6 +12,7 @@ const noteSchema = new Schema({
     isArchived: { type: Boolean, default: false },
     isCompleted: { type: Boolean, default: false },
     updatedOn: { type: Date, default: Date.now },
+    reminder: { type: Date, default: null },
 });
 
 module.exports = mongoose.model("Note", noteSchema);
