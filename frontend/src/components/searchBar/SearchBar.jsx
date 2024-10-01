@@ -1,10 +1,38 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { FaSearch } from "react-icons/fa";
 import { TextField, Button, Select, MenuItem, FormControl, InputLabel } from "@mui/material";
 import "./SearchBar.css";
 
 const SearchBar = ({ value, onChange, handleSearch, onClearSearch, setSortBy, sortBy }) => {
   const [tagInput, setTagInput] = useState("");
+  const [debounceTimeout, setDebounceTimeout] = useState(null);
+
+  const debounceSearch = useCallback((query, tags) => {
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout);
+    }
+
+    const newTimeout = setTimeout(() => {
+      handleSearch(query, tags);
+    }, 500);
+
+    setDebounceTimeout(newTimeout);
+  }, [debounceTimeout, handleSearch]);
+
+  useEffect(() => {
+    const tagsArray = tagInput
+      .split(",")
+      .map(tag => tag.trim())
+      .filter(tag => tag !== "");
+
+    debounceSearch(value, tagsArray);
+
+    return () => {
+      if (debounceTimeout) {
+        clearTimeout(debounceTimeout);
+      }
+    };
+  }, [value, tagInput, debounceSearch]);
 
   const handleSearchClick = () => {
     const searchQuery = value;
