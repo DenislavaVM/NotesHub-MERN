@@ -222,8 +222,8 @@ app.put("/edit-note/:noteId", authenticateToken, async (req, res) => {
             note.content = content;
         }
 
-        if (tags) {
-         filter.tags = { $in: tags.split(",") };
+        if (tags && Array.isArray(tags)) {
+            note.tags = tags;
         }
 
         if (isPinned) {
@@ -266,10 +266,10 @@ app.get("/get-all-notes", authenticateToken, async (req, res) => {
             ];
         }
 
-      if (tags && tags !== "") {
-        const tagsArray = tags.split(",").map(tag => tag.trim());
-        filter.tags = { $in: tagsArray };
-      }
+        if (tags && tags !== "") {
+            const tagsArray = tags.split(",").map(tag => tag.trim());
+            filter.tags = { $in: tagsArray };
+        }
 
         let sortOptions = { isPinned: -1 };
         if (sortBy === "created") {
