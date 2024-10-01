@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { FaSearch } from "react-icons/fa";
+import { TextField, Button, Select, MenuItem, FormControl, InputLabel } from "@mui/material";
 import "./SearchBar.css";
 
-const SearchBar = ({ value, onChange, handleSearch, onClearSearch, setSortBy }) => {
+const SearchBar = ({ value, onChange, handleSearch, onClearSearch, setSortBy, sortBy }) => {
   const [tagInput, setTagInput] = useState("");
 
   const handleSearchClick = () => {
@@ -29,39 +30,45 @@ const SearchBar = ({ value, onChange, handleSearch, onClearSearch, setSortBy }) 
 
   return (
     <div className="search-bar-container">
-      <input
-        type="text"
-        placeholder="Search notes"
-        className="search-bar-input"
+      <TextField
+        label="Search notes"
+        variant="outlined"
+        fullWidth
         value={value}
         onChange={onChange}
         onKeyDown={handleKeyPress}
       />
-      <input
-        type="text"
-        placeholder="Enter tags (comma separated)"
-        className="tag-input"
+      <TextField
+        label="Enter tags"
+        variant="outlined"
+        fullWidth
         value={tagInput}
         onChange={(e) => setTagInput(e.target.value)}
         onKeyDown={handleKeyPress}
       />
 
-      <select className="sort-select" onChange={(e) => setSortBy(e.target.value)}>
-        <option value="">Sort by</option>
-        <option value="created">Created Date</option>
-        <option value="updated">Updated Date</option>
-      </select>
+      <FormControl fullWidth variant="outlined">
+        <InputLabel>Sort by</InputLabel>
+        <Select
+          label="Sort by"
+          value={sortBy || ""}
+          onChange={(e) => setSortBy(e.target.value)}
+        >
+          <MenuItem value="">None</MenuItem>
+          <MenuItem value="created">Created Date</MenuItem>
+          <MenuItem value="updated">Updated Date</MenuItem>
+        </Select>
+      </FormControl>
 
       <div className="search-bar-buttons">
-        <button className="search-bar-button" onClick={handleSearchClick}>
-          <FaSearch className="search-icon" />
-        </button>
+        <Button variant="contained" color="primary" onClick={handleSearchClick}>
+          <FaSearch className="search-icon" /> Search
+        </Button>
 
-        <button className="clear-button" onClick={handleClearClick}>
+        <Button variant="outlined" color="secondary" onClick={handleClearClick}>
           Clear
-        </button>
+        </Button>
       </div>
-
     </div>
   );
 };

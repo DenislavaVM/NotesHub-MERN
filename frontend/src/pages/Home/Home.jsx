@@ -11,6 +11,7 @@ import Notification from "../../components/Notification/Notification";
 import EmptyCard from "../../components/EmptyCard/EmptyCard";
 import AddNotesImg from "../../assets/images/add-notes.svg";
 import NoDataImg from "../../assets/images/no-data.svg";
+import { Fab, Button, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 
 const Home = () => {
   const [openAddEditModel, setOpenAddEditModal] = useState({
@@ -68,7 +69,7 @@ const Home = () => {
 
   const getAllNotes = async () => {
     const validTags = Array.isArray(tags) ? tags : [];
-  
+
     try {
       const response = await apiClient.get("/get-all-notes", {
         params: {
@@ -77,7 +78,7 @@ const Home = () => {
           sortBy: sortBy || "",
         },
       });
-  
+
       if (response.data && response.data.notes) {
         setAllNotes(response.data.notes);
       } else {
@@ -181,41 +182,31 @@ const Home = () => {
         </div>
       </div>
 
-      <button
-        className="add-button"
-        onClick={() => {
-          setOpenAddEditModal({ isShown: true, type: "add", data: null });
-        }}
+      <Fab
+        color="primary"
+        aria-label="add"
+        style={{ position: "fixed", bottom: "20px", right: "20px" }}
+        onClick={() => setOpenAddEditModal({ isShown: true, type: "add", data: null })}
       >
-        <MdAdd className="add-icon" />
-      </button>
+        <MdAdd />
+      </Fab>
 
-      <Modal
-        isOpen={openAddEditModel.isShown}
-        onRequestClose={() =>
-          setOpenAddEditModal({ isShown: false, type: "", data: null })
-        }
-        style={{
-          overlay: {
-            backgroundColor: "rgba(0,0,0,0.2)",
-          },
-        }}
-        className="modal-content"
-      >
-        <AddEditNotes
-          type={openAddEditModel.type}
-          noteData={openAddEditModel.data}
-          onClose={() => {
-            setOpenAddEditModal({
-              isShown: false,
-              type: "add",
-              data: null,
-            });
-          }}
-          getAllNotes={getAllNotes}
-          showNotificationMessage={showNotificationMessage}
-        />
-      </Modal>
+      <Dialog open={openAddEditModel.isShown} onClose={() => setOpenAddEditModal({ isShown: false, type: "", data: null })}>
+        <DialogTitle>Add/Edit Note</DialogTitle>
+        <DialogContent>
+          <AddEditNotes
+            type={openAddEditModel.type}
+            noteData={openAddEditModel.data}
+            onClose={() => setOpenAddEditModal({ isShown: false, type: "add", data: null })}
+            getAllNotes={getAllNotes}
+            showNotificationMessage={showNotificationMessage}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenAddEditModal({ isShown: false, type: "", data: null })}>Cancel</Button>
+        </DialogActions>
+      </Dialog>
+
       <Notification
         isShown={showNotificationMsg.isShown}
         message={showNotificationMsg.message}

@@ -26,29 +26,3 @@
   height: calc(100vh - 200px);
   padding: 0;
 }
-
-.add-button {
-  width: 4rem;
-  height: 4rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #4f46e5, var(--primary-color));
-  box-shadow: var(--hover-shadow);
-  position: fixed;
-  right: 3rem;
-  bottom: 3rem;
-  transition: all 0.3s ease;
-}
-
-.add-button:hover {
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  transform: translateY(-4px);
-  box-shadow: var(--hover-shadow);
-}
-
-.add-icon {
-  font-size: 2rem;
-  color: #fff;
-}
