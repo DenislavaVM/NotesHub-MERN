@@ -1,6 +1,7 @@
 require("dotenv").config();
 
 const mongoose = require("mongoose");
+const { check, validationResult } = require('express-validator');
 
 mongoose.connect(process.env.MONGO_URI);
 
@@ -31,7 +32,17 @@ app.get("/", (req, res) => {
     res.json({ data: "Hello" });
 });
 
-app.post("/create-account", async (req, res) => {
+app.post("/create-account", [
+    check('firstName').not().isEmpty().withMessage('First name is required'),
+    check('lastName').not().isEmpty().withMessage('Last name is required'),
+    check('email').isEmail().withMessage('Valid email is required'),
+    check('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long')
+], async (req, res) => {
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
 
     const { firstName, lastName, email, password } = req.body;
 
@@ -95,7 +106,16 @@ app.post("/create-account", async (req, res) => {
     });
 });
 
-app.post("/login", async (req, res) => {
+app.post("/login", [
+    check('email').isEmail().withMessage('Valid email is required'),
+    check('password').not().isEmpty().withMessage('Password is required')
+], async (req, res) => {
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
     const { email, password } = req.body;
 
     if (!email) {
