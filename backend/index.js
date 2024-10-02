@@ -1,5 +1,7 @@
 require("dotenv").config();
-
+const express = require("express");
+const cors = require("cors");
+const helmet = require("helmet");
 const mongoose = require("mongoose");
 const { check, validationResult } = require('express-validator');
 
@@ -7,26 +9,22 @@ mongoose.connect(process.env.MONGO_URI);
 
 const User = require("./models/user.model");
 const Note = require("./models/note.model");
+const { authenticateToken } = require("./utils");
+const bcrypt = require("bcrypt");
 
-const express = require("express");
-const cors = require("cors");
 const app = express();
 
 const jwt = require("jsonwebtoken");
-const { authenticateToken } = require("./utils");
 
-const bcrypt = require("bcrypt");
 const saltRounds = 10;
-const helmet = require("helmet")
 
-app.use(helmet());
 app.use(express.json());
-
 app.use(
     cors({
         origin: "*",
     })
 );
+app.use(helmet());
 
 app.get("/", (req, res) => {
     res.json({ data: "Hello" });
@@ -176,20 +174,20 @@ app.get("/get-user", authenticateToken, async (req, res) => {
     });
 });
 
-app.post("/add-note", authenticateToken, async (req, res) => {
+app.post("/add-note", authenticateToken, async (req, res, next) => {
     const { title, content, tags, isPinned } = req.body;
     const user = req.user;
 
     if (!title) {
-        return res
-            .status(400)
-            .json({ error: true, message: "Title is required" })
+        const error = new Error("Title is required");
+        error.status = 400;
+        return next(error);
     }
 
     if (!content) {
-        return res
-            .status(400)
-            .json({ error: true, message: "Content is required" })
+        const error = new Error("Content is required");
+        error.status = 400;
+        return next(error);
     }
 
     try {
@@ -209,10 +207,7 @@ app.post("/add-note", authenticateToken, async (req, res) => {
             message: "Note added successfully",
         });
     } catch (error) {
-        return res.status(500).json({
-            error: true,
-            message: "Internal server error",
-        });
+        next(error);
     }
 });
 
@@ -544,6 +539,13 @@ app.put("/set-reminder/:noteId", authenticateToken, async (req, res) => {
     } catch (error) {
         return res.status(500).json({ error: true, message: "Internal server error" });
     }
+});
+
+app.use((err, req, res, next) => {
+    res.status(err.status || 500).json({
+        error: true,
+        message: err.message || 'Internal Server Error',
+    });
 });
 
 app.listen(3000, () => console.log("Server started on port 3000"));
