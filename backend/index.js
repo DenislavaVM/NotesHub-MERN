@@ -81,7 +81,7 @@ app.post("/create-account", async (req, res) => {
         { user: { _id: user._id, firstName: user.firstName, lastName: user.lastName, email: user.email } },
         process.env.ACCESS_TOKEN_SECRET,
         {
-            expiresIn: "36000m",
+            expiresIn: "1h",
         }
     );
 
