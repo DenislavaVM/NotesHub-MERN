@@ -5,6 +5,7 @@ const helmet = require("helmet");
 const mongoose = require("mongoose");
 const { check, validationResult } = require("express-validator");
 const rateLimit = require("express-rate-limit");
+const logger = require("./logger");
 
 mongoose.connect(process.env.MONGO_URI);
 
@@ -26,8 +27,17 @@ app.use(helmet());
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 5,
-    message: "Too many login attempts, please try again after 15 minutes"
+    message: "Too many login attempts, please try again after 15 minutes",
+    handler: (req, res, next, options) => {
+        logger.warn(`Too many login attempts for IP: ${req.ip}, email: ${req.body.email}`);
+        res.status(options.statusCode).json({
+            error: true,
+            message: options.message
+        });
+    }
 });
+
+app.use("/login", loginLimiter);
 
 app.get("/", (req, res) => {
     res.json({ data: "Hello" });
@@ -80,11 +90,12 @@ app.post("/create-account", [
             message: "Registration successful",
         });
     } catch (error) {
+        logger.error(`Error during registration: ${error.message}`);
         next(error);
     }
 });
 
-app.post("/login", loginLimiter, [
+app.post("/login", [
     check("email").isEmail().withMessage("Valid email is required"),
     check("password").not().isEmpty().withMessage("Password is required")
 ], async (req, res, next) => {
@@ -108,11 +119,13 @@ app.post("/login", loginLimiter, [
             const user = { _id: userInfo._id, firstName: userInfo.firstName, lastName: userInfo.lastName, email: userInfo.email };
             const accessToken = jwt.sign({ user }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "1h" });
 
+            logger.info(`User ${email} logged in successfully`);
             return res.json({ error: false, message: "Login successful", email, accessToken });
         } else {
             return res.status(400).json({ error: true, message: "Invalid credentials" });
         }
     } catch (error) {
+        logger.error(`Error during login: ${error.message}`);
         next(error);
     }
 });
@@ -137,6 +150,7 @@ app.get("/get-user", authenticateToken, async (req, res, next) => {
             message: "",
         });
     } catch (error) {
+        logger.error(`Error retrieving user: ${error.message}`);
         next(error);
     }
 });
@@ -168,17 +182,20 @@ app.post("/add-note", authenticateToken, async (req, res, next) => {
 
         await note.save();
 
+        logger.info(`Note added successfully by user: ${user.email}`);
         return res.json({
             error: false,
             note,
             message: "Note added successfully",
         });
     } catch (error) {
+        logger.error(`Error adding note: ${error.message}`);
         next(error);
     }
 });
 
 app.use((err, req, res, next) => {
+    logger.error(`Error: ${err.message}`);
     res.status(err.status || 500).json({
         error: true,
         message: err.message || "Internal Server Error",
