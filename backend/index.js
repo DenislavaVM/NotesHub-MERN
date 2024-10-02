@@ -16,7 +16,9 @@ const { authenticateToken } = require("./utils");
 
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
+const helmet = require("helmet")
 
+app.use(helmet());
 app.use(express.json());
 
 app.use(
@@ -121,7 +123,7 @@ app.post("/login", async (req, res) => {
     if (isPasswordValid) {
         const user = { _id: userInfo._id, firstName: userInfo.firstName, lastName: userInfo.lastName, email: userInfo.email };
         const accessToken = jwt.sign({ user }, process.env.ACCESS_TOKEN_SECRET, {
-            expiresIn: "36000m",
+            expiresIn: "1h",
         });
 
         return res.json({ error: false, message: "Login successful", email, accessToken });
@@ -198,7 +200,6 @@ app.put("/edit-note/:noteId", authenticateToken, async (req, res) => {
     const noteId = req.params.noteId;
     const { title, content, tags, reminder, isPinned } = req.body;
 
-    console.log("Request Body:", req.body);  // Logs the request body to the console
     const user = req.user;
 
     if (!title && !content && !tags && typeof isPinned === 'undefined' && !reminder) {
