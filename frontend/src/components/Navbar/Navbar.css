@@ -13,6 +13,20 @@
   flex-wrap: wrap;
 }
 
+.navbar-link {
+  margin-left: 1.5rem;
+  font-size: 1rem;
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.navbar-link:hover {
+  color: var(--secondary-color);
+  text-decoration: underline;
+}
+
 .navbar-title {
   font-size: 1.75rem;
   font-weight: bold;

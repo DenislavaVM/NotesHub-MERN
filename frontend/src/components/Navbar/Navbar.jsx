@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import "./Navbar.css";
+import { Link, useNavigate } from "react-router-dom";
 import ProfileInfo from "../Cards/ProfileInfo";
-import { useNavigate } from "react-router-dom";
 import SearchBar from "../searchBar/SearchBar";
+import "./Navbar.css";
 
 const Navbar = ({ userInfo, onSearchNote, handleClearSearch, setTags, setSortBy }) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -26,6 +26,9 @@ const Navbar = ({ userInfo, onSearchNote, handleClearSearch, setTags, setSortBy 
     <div className="navbar">
       <div className="navbar-left">
         <h2 className="navbar-title">Notes</h2>
+        <Link to="/labels" className="navbar-link">
+          Labels
+        </Link>
       </div>
       <div className="navbar-center">
         <SearchBar
