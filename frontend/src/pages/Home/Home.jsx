@@ -12,6 +12,7 @@ import EmptyCard from "../../components/EmptyCard/EmptyCard";
 import AddNotesImg from "../../assets/images/add-notes.svg";
 import NoDataImg from "../../assets/images/no-data.svg";
 import { Fab, Button, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+import { useAuth } from "../../hooks/useAuth";
 
 const Home = () => {
   const [openAddEditModel, setOpenAddEditModal] = useState({
@@ -26,6 +27,7 @@ const Home = () => {
     type: "add",
   });
 
+  const { setUser } = useAuth();
   const [allNotes, setAllNotes] = useState([]);
   const [userInfo, setUserInfo] = useState(null);
   const [isSearch, setIsSearch] = useState(false);
@@ -56,9 +58,10 @@ const Home = () => {
   const getUserInfo = async () => {
     try {
       const response = await apiClient.get("/get-user");
-      if (response.data && response.data.user) {
+      if (response.data) {
+        setUser(response.data);
         setUserInfo(response.data.user);
-      }
+      };
     } catch (error) {
       if (error.response.status === 401) {
         localStorage.clear();
@@ -68,6 +71,11 @@ const Home = () => {
   };
 
   const getAllNotes = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      return;
+    };
+
     const validTags = Array.isArray(tags) ? tags : [];
 
     try {
