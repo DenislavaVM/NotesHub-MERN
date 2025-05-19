@@ -1,4 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import Home from "./pages/Home/Home";
 import Login from "./pages/Login/Login";
 import SignUp from "./pages/SingUp/SignUp";
@@ -14,6 +17,8 @@ const App = () => {
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/labels" element={<Labels />} />
       </Routes>
+
+      <ToastContainer position="top-center" autoClose={3000} />
     </Router>
   );
 };
