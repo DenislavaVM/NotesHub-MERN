@@ -6,8 +6,10 @@ import "./Login.css";
 import PasswordInput from "../../components/input/PasswordInput";
 import { validateEmail } from "../../utils/helper";
 import apiClient from "../../utils/apiClient.js";
+import { useAuth } from "../../hooks/useAuth.js";
 
 const Login = () => {
+  const { setUser } = useAuth();
   const { register, handleSubmit, formState: { errors }, } = useForm();
   const [formError, setFormError] = useState("");
   const navigate = useNavigate();
@@ -20,6 +22,10 @@ const Login = () => {
 
       if (response.data && response.data.accessToken) {
         localStorage.setItem("token", response.data.accessToken);
+        const userRes = await apiClient.get("/get-user", {
+          headers: { Authorization: `Bearer ${response.data.accessToken}` }
+        });
+        setUser(userRes.data);
         navigate("/dashboard");
       };
     } catch (error) {
