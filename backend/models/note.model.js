@@ -8,6 +8,7 @@ const noteSchema = new Schema({
     tags: { type: [String], default: [] },
     isPinned: { type: Boolean, required: false },
     userId: { type: String, required: true },
+    sharedWith: { type: [String], default: [] },
     createdOn: { type: Date, default: Date.now },
     isArchived: { type: Boolean, default: false },
     isCompleted: { type: Boolean, default: false },

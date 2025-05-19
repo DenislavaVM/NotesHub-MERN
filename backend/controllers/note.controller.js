@@ -1,4 +1,5 @@
 const Note = require("../models/note.model");
+const User = require("../models/user.model");
 const logger = require("../logger");
 
 exports.addNote = async (req, res, next) => {
@@ -71,7 +72,12 @@ exports.getAllNotes = async (req, res) => {
   }
 
   try {
-    let filter = { userId: user._id };
+    let filter = {
+      $or: [
+        { userId: user._id },
+        { sharedWith: user.email }
+      ]
+    };
 
     if (searchQuery) {
       filter.$or = [
@@ -262,4 +268,30 @@ exports.setReminder = async (req, res) => {
   } catch (error) {
     return res.status(500).json({ error: true, message: "Internal server error" });
   }
+};
+
+exports.shareNote = async (req, res) => {
+  const noteId = req.params.noteId;
+  const { emails } = req.body;
+  const user = req.user;
+
+  if (!emails || !Array.isArray(emails) || emails.length === 0) {
+    return res.status(400).json({ error: true, message: "Emails are required" });
+  };
+
+  try {
+    const note = await Note.findOne({ _id: noteId, userId: user._id });
+
+    if (!note) {
+      return res.status(404).json({ error: true, message: "Note not found or access denied" });
+    };
+
+    const newEmails = emails.filter(email => !note.sharedWith.includes(email));
+    note.sharedWith.push(...newEmails);
+    await note.save();
+
+    return res.json({ error: false, note, message: "Note shared successfully" });
+  } catch (error) {
+    return res.status(500).json({ error: true, message: "Internal server error" });
+  };
 };

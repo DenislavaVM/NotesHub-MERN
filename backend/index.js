@@ -100,6 +100,7 @@ app.put("/complete-note/:noteId", authenticateToken, noteController.completeNote
 app.put("/add-label/:noteId", authenticateToken, noteController.addLabel);
 app.put("/remove-label/:noteId", authenticateToken, noteController.removeLabel);
 app.put("/set-reminder/:noteId", authenticateToken, noteController.setReminder);
+app.put("/share-note/:noteId", authenticateToken, noteController.shareNote);
 app.get("/labels", authenticateToken, labelController.getAllLabels);
 app.post("/labels", authenticateToken, labelController.createLabel);
 app.put("/labels/:labelId", authenticateToken, labelController.updateLabel);
