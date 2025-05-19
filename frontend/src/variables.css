@@ -22,16 +22,16 @@
 }
 
 body.dark {
-  --background-color: #1f2937;
-  --font-color: #f9fafb;
-  --card-bg-color: #2d3748;
-  --note-tag-bg: #4b5563;
-  --note-tag-text: #e5e7eb;
-  --note-content-color: #cbd5e1;
-  --note-date-color: #9ca3af;
-  --input-border: 1px solid #4b5563;
+  --background-color: #2f3542;
+  --font-color: #f1f2f6;
+  --card-bg-color: #3b3f47;
+  --note-tag-bg: #505660;
+  --note-tag-text: #e0e6ed;
+  --note-content-color: #dcdde1;
+  --note-date-color: #a4b0be;
+  --input-border: 1px solid #596275;
   --input-focus-border: 1px solid var(--primary-color);
-  --box-shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
-  --hover-shadow: 0 12px 24px rgba(255, 255, 255, 0.1);
-  --text-color-light: #cbd5e1;
+  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  --hover-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
+  --text-color-light: #d2dae2;
 }
