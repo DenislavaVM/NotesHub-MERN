@@ -5,14 +5,22 @@ import { MdDarkMode, MdLightMode } from "react-icons/md";
 import ProfileInfo from "../Cards/ProfileInfo";
 import SearchBar from "../searchBar/SearchBar";
 import { useTheme } from "../../context/ThemeContext";
+import { useAuth } from "../../hooks/useAuth";
 import "./Navbar.css";
 
-const Navbar = ({ userInfo, onSearchNote, handleClearSearch, setTags, setSortBy }) => {
+const Navbar = ({
+  onSearchNote = () => { },
+  handleClearSearch = () => { },
+  setTags = () => { },
+  setSortBy = () => { },
+}) => {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
+  const { user, logout } = useAuth();
 
   const onLogout = () => {
+    logout();
     localStorage.clear();
     navigate("/login");
   };
@@ -56,9 +64,13 @@ const Navbar = ({ userInfo, onSearchNote, handleClearSearch, setTags, setSortBy 
             </>
           )}
         </button>
-        <ProfileInfo userInfo={userInfo} onLogout={onLogout} />
+        {user ? (
+          <ProfileInfo userInfo={user} onLogout={logout} />
+        ) : (
+          <Link to="/login" className="navbar-link">Login</Link>
+        )}
       </div>
-    </div>
+    </div >
   );
 };
 
