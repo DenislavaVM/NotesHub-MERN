@@ -166,6 +166,7 @@ const Home = () => {
                   onEdit={() => handleEdit(note)}
                   onDelete={() => handleDelete(note)}
                   onPinNote={() => handlePin(note)}
+                  noteId={note._id}
                 />
               ))
             ) : (
