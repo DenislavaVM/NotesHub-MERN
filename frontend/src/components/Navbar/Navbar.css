@@ -1,7 +1,7 @@
 @import "../../variables.css";
 
 .navbar {
-  background-color: white;
+  background-color: var(--card-bg-color);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -50,6 +50,22 @@
   position: relative;
 }
 
+.theme-toggle-btn {
+  background: transparent;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  color: var(--font-color);
+  margin-left: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.theme-toggle-btn:hover {
+  text-decoration: underline;
+}
+
 .search-bar-container {
   width: 100%;
   max-width: 500px;
@@ -60,7 +76,7 @@
   align-items: center;
   gap: 1.5rem;
   padding: 1rem 1.5rem;
-  background-color: #ffffff;
+  background-color: var(--card-bg-color);
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }

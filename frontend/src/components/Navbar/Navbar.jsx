@@ -1,12 +1,16 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { MdDarkMode, MdLightMode } from "react-icons/md";
+
 import ProfileInfo from "../Cards/ProfileInfo";
 import SearchBar from "../searchBar/SearchBar";
+import { useTheme } from "../../context/ThemeContext";
 import "./Navbar.css";
 
 const Navbar = ({ userInfo, onSearchNote, handleClearSearch, setTags, setSortBy }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
 
   const onLogout = () => {
     localStorage.clear();
@@ -41,6 +45,17 @@ const Navbar = ({ userInfo, onSearchNote, handleClearSearch, setTags, setSortBy 
         />
       </div>
       <div className="navbar-right">
+        <button onClick={toggleTheme} className="theme-toggle-btn">
+          {theme === "dark" ? (
+            <>
+              <MdLightMode /> Light
+            </>
+          ) : (
+            <>
+              <MdDarkMode /> Dark
+            </>
+          )}
+        </button>
         <ProfileInfo userInfo={userInfo} onLogout={onLogout} />
       </div>
     </div>
