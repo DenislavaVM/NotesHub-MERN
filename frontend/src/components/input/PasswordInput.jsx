@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
-import "./PasswordInput.css"; 
+import "./PasswordInput.css";
 
-const PasswordInput = ({ value, onChange, placeholder }) => {
+const PasswordInput = React.forwardRef(({ name, onChange, onBlur, placeholder }, ref) => {
   const [isShowPassword, setIsShowPassword] = useState(false);
-  
+
   const toggleShowPassword = () => {
     setIsShowPassword((prevState) => !prevState);
   };
@@ -12,8 +12,10 @@ const PasswordInput = ({ value, onChange, placeholder }) => {
   return (
     <div className="password-input-container">
       <input
-        value={value}
+        ref={ref}
+        name={name}
         onChange={onChange}
+        onBlur={onBlur}
         type={isShowPassword ? "text" : "password"}
         placeholder={placeholder || "Password"}
         className="password-input-field"
@@ -33,6 +35,8 @@ const PasswordInput = ({ value, onChange, placeholder }) => {
       </button>
     </div>
   );
-};
+});
+
+PasswordInput.displayName = "PasswordInput";
 
 export default PasswordInput;

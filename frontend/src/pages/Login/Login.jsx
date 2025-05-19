@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useForm } from "react-hook-form";
 import Navbar from "../../components/Navbar/Navbar";
 import { Link, useNavigate } from "react-router-dom";
 import "./Login.css";
@@ -7,45 +8,27 @@ import { validateEmail } from "../../utils/helper";
 import apiClient from "../../utils/apiClient.js";
 
 const Login = () => {
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);
-
+  const { register, handleSubmit, formState: { errors }, } = useForm();
+  const [formError, setFormError] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-
-    if (!validateEmail(email)) {
-      setError("Please enter a valid email address.");
-      return;
-    }
-
-    if (!password) {
-      setError("Please enter your password.");
-      return;
-    }
-
-    setError("");
+  const onSubmit = async (data) => {
+    setFormError("");
 
     try {
-      const response = await apiClient.post("/login", {
-        email: email,
-        password: password,
-      });
+      const response = await apiClient.post("/login", data);
 
       if (response.data && response.data.accessToken) {
         localStorage.setItem("token", response.data.accessToken);
         navigate("/dashboard");
-      }
+      };
     } catch (error) {
-      if (error.response && error.response.data && error.response.data.message) {
-        setError(error.response.data.message);
+      if (error.response?.data?.message) {
+        setFormError(error.response.data.message);
       } else {
-        setError("An unexpexted error occured. Please try again.");
-      }
-    }
+        setFormError("An unexpected error occurred. Please try again.");
+      };
+    };
   };
 
   return (
@@ -54,22 +37,30 @@ const Login = () => {
       <div className="login-container">
         <div className="login-form">
           <h4 className="login-title">Login</h4>
-          <form onSubmit={handleLogin}>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <input
               id="email"
               type="text"
               placeholder="Email"
               className="input-box"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              {...register("email", {
+                required: "Email is required",
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: "Enter a valid email address",
+                },
+              })}
               aria-label="Email"
             />
+            {errors.email && <p className="error-message">{errors.email.message}</p>}
             <PasswordInput
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              {...register("password", {
+                required: "Password is required",
+              })}
               placeholder="Password"
             />
-            {error && <p className="error-message">{error}</p>}
+            {errors.password && <p className="error-message">{errors.password.message}</p>}
+            {formError && <p className="error-message">{formError}</p>}
             <button type="submit" className="btn-primary">Login</button>
           </form>
           <p className="register-prompt">
