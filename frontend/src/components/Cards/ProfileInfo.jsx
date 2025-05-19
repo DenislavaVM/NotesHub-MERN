@@ -7,7 +7,7 @@ const ProfileInfo = ({ userInfo, onLogout }) => {
     return null;
   }
 
-  const userName = `${userInfo.firstName} ${userInfo.lastName}`;
+  const userName = `${userInfo.firstName || ""} ${userInfo.lastName || ""}`;
   const initials = getInitials(userName);
 
   return (
