@@ -2,9 +2,10 @@
   display: flex;
   flex-direction: column;
   padding: 1rem;
-  background-color: #ffffff;
+  background-color: var(--card-bg-color);
+  color: var(--font-color);
   border-radius: 20px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--box-shadow); 
   width: 100%;
   max-width: 600px;
   position: fixed;
@@ -31,9 +32,10 @@
 .textarea-content,
 .input-tags {
   font-size: 1rem;
-  color: #1f2937;
   outline: none;
-  border: 1px solid #e5e7eb;
+  background-color: var(--card-bg-color);
+  color: var(--font-color);
+  border: var(--input-border);
   padding: 0.75rem;
   border-radius: 6px;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
