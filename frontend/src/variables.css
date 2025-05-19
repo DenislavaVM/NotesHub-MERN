@@ -4,8 +4,11 @@
   --gray-color: #6b7280;
   --light-gray: #e2e8f0;
   --font-color: #1f2937;
-  --border-radius: 1rem;
-  --padding: 1.5rem;
+  --card-bg-color: #ffffff;
+  --note-tag-bg: #f3f4f6;
+  --note-content-color: #4b5563;
+  --note-date-color: #9ca3af;
+  --note-tag-text: #374151;
   --box-shadow: 0 6px 16px rgba(0, 0, 0, 0.01);
   --hover-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
 
@@ -16,4 +19,19 @@
   --button-padding: 0.75rem 1.5rem;
   --text-color-light: #9ca3af;
   --box-radius-small: 0.5rem;
+}
+
+body.dark {
+  --background-color: #1f2937;
+  --font-color: #f9fafb;
+  --card-bg-color: #2d3748;
+  --note-tag-bg: #4b5563;
+  --note-tag-text: #e5e7eb;
+  --note-content-color: #cbd5e1;
+  --note-date-color: #9ca3af;
+  --input-border: 1px solid #4b5563;
+  --input-focus-border: 1px solid var(--primary-color);
+  --box-shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
+  --hover-shadow: 0 12px 24px rgba(255, 255, 255, 0.1);
+  --text-color-light: #cbd5e1;
 }
