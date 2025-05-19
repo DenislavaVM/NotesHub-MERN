@@ -1,0 +1,28 @@
+.labels-page {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #fff;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+.labels-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.label-input-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.error-message {
+    color: var(--error-color);
+    margin: 0.5rem 0;
+    font-size: 0.875rem;
+    text-align: center;
+}
