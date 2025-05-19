@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useForm } from "react-hook-form";
 import Navbar from "../../components/Navbar/Navbar";
 import PasswordInput from "../../components/input/PasswordInput";
 import { Link, useNavigate } from "react-router-dom";
@@ -7,60 +8,27 @@ import "./SignUp.css";
 import apiClient from "../../utils/apiClient";
 
 const SignUp = () => {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState({});
-
+  const { register, handleSubmit, formState: { errors } } = useForm();
+  const [formError, setFormError] = useState("");
   const navigate = useNavigate();
 
-  const handleSignUp = async (e) => {
-    e.preventDefault();
-    let errors = {};
-
-    if (!firstName) {
-      errors.firstName = "First name is required";
-    }
-
-    if (!lastName) {
-      errors.lastName = "Last name is required";
-    }
-
-    if (!validateEmail(email)) {
-      errors.email = "Email address is required";
-    }
-
-    if (!password) {
-      errors.password = "Password is required";
-    }
-
-    if (Object.keys(errors).length > 0) {
-      setError(errors);
-      return;
-    }
-
-    setError({}); 
+  const onSubmit = async (data) => {
+    setFormError("");
 
     try {
-      const response = await apiClient.post("/create-account", {
-        firstName,
-        lastName,
-        email,
-        password,
-      });
+      const response = await apiClient.post("/create-account", data);
 
       if (response.data && response.data.accessToken) {
         localStorage.setItem("token", response.data.accessToken);
         navigate("/dashboard");
-      } else if (response.data && response.data.message) {
-        setError({ form: response.data.message });
-      }
+      } else if (response.data?.message) {
+        setFormError(response.data.message);
+      };
     } catch (error) {
-      if (error.response && error.response.data && error.response.data.message) {
-        setError({ form: error.response.data.message });
+      if (error.response?.data?.message) {
+        setFormError(error.response.data.message);
       } else {
-        setError({ form: "An unexpected error occurred. Please try again." });
+        setFormError("An unexpected error occurred. Please try again.");
       }
     }
   };
@@ -70,58 +38,65 @@ const SignUp = () => {
       <Navbar />
       <div className="signup-container">
         <div className="signup-form">
-          <form onSubmit={handleSignUp}>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <h4 className="signup-title">Register</h4>
 
-            <div className={`input-wrapper ${error.firstName ? "input-error" : ""}`}>
+            <div className="input-wrapper">
               <input
                 id="firstName"
                 type="text"
                 placeholder="First name"
                 className="input-box"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
+                {...register("firstName", { required: "First name is required" })}
                 aria-label="First name"
               />
-              {error.firstName && <p className="error-message">{error.firstName}</p>}
+              {errors.firstName && <p className="error-message">{errors.firstName.message}</p>}
             </div>
 
-            <div className={`input-wrapper ${error.lastName ? "input-error" : ""}`}>
+            <div className="input-wrapper">
               <input
                 id="lastName"
                 type="text"
                 placeholder="Last name"
                 className="input-box"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
+                {...register("lastName", { required: "Last name is required" })}
                 aria-label="Last name"
               />
-              {error.lastName && <p className="error-message">{error.lastName}</p>}
+              {errors.lastName && <p className="error-message">{errors.lastName.message}</p>}
             </div>
 
-            <div className={`input-wrapper ${error.email ? "input-error" : ""}`}>
+            <div className="input-wrapper">
               <input
                 id="email"
                 type="text"
                 placeholder="Email"
                 className="input-box"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                aria-label="Email"
+                {...register("email", {
+                  required: "Email is required",
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: "Enter a valid email address"
+                  }
+                })}
               />
-              {error.email && <p className="error-message">{error.email}</p>}
+              {errors.email && <p className="error-message">{errors.email.message}</p>}
             </div>
 
-            <div className={`input-wrapper ${error.password ? "input-error" : ""}`}>
+            <div className="input-wrapper">
               <PasswordInput
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
+                {...register("password", {
+                  required: "Password is required",
+                  pattern: {
+                    value: /^(?=.*[A-Z])(?=.*\d).{8,}$/,
+                    message: "Must be 8+ chars, 1 uppercase, 1 number"
+                  }
+                })}
               />
-              {error.password && <p className="error-message">{error.password}</p>}
+              {errors.password && <p className="error-message">{errors.password.message}</p>}
             </div>
 
-            {error.form && <p className="error-message">{error.form}</p>}
+            {formError && <p className="error-message">{formError}</p>}
 
             <button type="submit" className="btn-primary">Create account</button>
           </form>
