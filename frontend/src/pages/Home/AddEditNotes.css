@@ -106,6 +106,22 @@
   padding-top: 1rem;
 }
 
+.manage-labels-link {
+  text-align: right;
+  margin-top: 0.25rem;
+}
+
+.manage-labels-link a {
+  font-size: 0.85rem;
+  color: var(--primary-color);
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.manage-labels-link a:hover {
+  color: var(--secondary-color);
+}
+
 @media (max-width: 768px) {
   .add-edit-notes-container {
     width: 90%;

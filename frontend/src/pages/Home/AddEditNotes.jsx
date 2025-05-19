@@ -1,8 +1,9 @@
-import React, { useState } from "react";
-import "./AddEditNotes.css";
-import TagInput from "../../components/input/TagInput";
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { MdClose } from "react-icons/md";
+import { FormControl, InputLabel, Select, MenuItem, Checkbox, ListItemText } from "@mui/material";
 import apiClient from "../../utils/apiClient";
+import "./AddEditNotes.css";
 
 const AddEditNotes = ({ noteData, type, getAllNotes, onClose, showNotificationMessage }) => {
   const [title, setTitle] = useState(noteData?.title || "");
@@ -10,6 +11,7 @@ const AddEditNotes = ({ noteData, type, getAllNotes, onClose, showNotificationMe
   const [tags, setTags] = useState(noteData?.tags || []);
   const [reminder, setReminder] = useState(noteData?.reminder || "");
   const [error, setError] = useState(null);
+  const [availableLabels, setAvailableLabels] = useState([]);
 
   const addNewNode = async () => {
     try {
@@ -83,6 +85,21 @@ const AddEditNotes = ({ noteData, type, getAllNotes, onClose, showNotificationMe
     }
   };
 
+  useEffect(() => {
+    const fetchLabels = async () => {
+      try {
+        const response = await apiClient.get("/labels");
+        if (response.data?.labels) {
+          setAvailableLabels(response.data.labels);
+        }
+      } catch (error) {
+        console.error("Error loading labels", error);
+      }
+    };
+    fetchLabels();
+  }, []);
+
+
   return (
     <div className="add-edit-notes-container">
       <button className="close-button" onClick={onClose}>
@@ -112,8 +129,25 @@ const AddEditNotes = ({ noteData, type, getAllNotes, onClose, showNotificationMe
       </div>
 
       <div className="input-group">
-        <label className="input-label">Tags</label>
-        <TagInput tags={tags} setTags={setTags} />
+        <FormControl fullWidth>
+          <InputLabel>Labels</InputLabel>
+          <Select
+            multiple
+            value={tags}
+            onChange={(e) => setTags(e.target.value)}
+            renderValue={(selected) => selected.join(", ")}
+          >
+            {availableLabels.map((label) => (
+              <MenuItem key={label._id} value={label.name}>
+                <Checkbox checked={tags.includes(label.name)} />
+                <ListItemText primary={label.name} />
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <div className="manage-labels-link">
+          <Link to="/labels">Manage Labels</Link>
+        </div>
       </div>
 
       <div className="input-group">
