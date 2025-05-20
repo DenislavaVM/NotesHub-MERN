@@ -6,8 +6,9 @@ export const useNotes = () => {
     const { showError } = useError();
     const [notes, setNotes] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [pagination, setPagination] = useState({ totalPages: 1, currentPage: 1 });
 
-    const fetchNotes = async ({ searchQuery = "", tags = [], sortBy = "" } = {}) => {
+    const fetchNotes = async ({ searchQuery = "", tags = [], sortBy = "", page = 1, limit = 10 } = {}) => {
         setLoading(true);
 
         try {
@@ -16,9 +17,11 @@ export const useNotes = () => {
                     searchQuery,
                     tags: tags.join(","),
                     sortBy,
+                    page
                 },
             });
             setNotes(response.data.notes || []);
+            setPagination(response.data.pagination || { totalPages: 1, currentPage: 1 });
         } catch (err) {
             showError(err.response?.data?.message || "Failed to fetch notes");
         } finally {
