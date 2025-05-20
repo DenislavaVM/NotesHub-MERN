@@ -73,7 +73,7 @@ exports.editNote = async (req, res) => {
 
 exports.getAllNotes = async (req, res) => {
   const user = req.user;
-  const { searchQuery, tags, sortBy } = req.query;
+  const { searchQuery, tags, sortBy, page = 1, limit = 10 } = req.query;
 
   if (!user || !user._id) {
     return res.status(400).json({ error: true, message: "User not authenticated or missing user ID" });
@@ -104,10 +104,22 @@ exports.getAllNotes = async (req, res) => {
       sortOptions = { createdOn: -1 };
     } else if (sortBy === "updated") {
       sortOptions = { updatedOn: -1 };
-    }
+    };
 
-    const notes = await Note.find(filter).sort(sortOptions);
-    return res.json({ error: false, notes, message: "All notes retrieved successfully" });
+    const totalCount = await Note.countDocuments(filter);
+    const notes = await Note.find(filter)
+      .sort(sortOptions)
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit));
+
+    return res.json({
+      error: false,
+      notes,
+      currentPage: Number(page),
+      totalPages: Math.ceil(totalCount / limit),
+      totalCount,
+      message: "Notes retrieved successfully"
+    });
   } catch (error) {
     return res.status(500).json({ error: true, message: "Internal server error" });
   }
