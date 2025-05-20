@@ -9,7 +9,7 @@ exports.createAccount = async (req, res, next) => {
   try {
     const isUser = await User.findOne({ email });
     if (isUser) {
-      return res.status(400).json({ error: true, message: "User already exists" });
+      return res.status(400).json({ error: true, message: errors.userExists });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -19,7 +19,7 @@ exports.createAccount = async (req, res, next) => {
     const accessToken = jwt.sign({ user: { _id: user._id, firstName, lastName, email } }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "1h" });
 
     logger.info(`New user created: ${email}`);
-    return res.json({ error: false, user, accessToken, message: "Registration successful" });
+    return res.json({ error: false, user, accessToken, message: success.registration });
   } catch (error) {
     logger.error(`Error during account creation: ${error.message}`);
     next(error);
@@ -32,7 +32,7 @@ exports.login = async (req, res, next) => {
   try {
     const userInfo = await User.findOne({ email });
     if (!userInfo) {
-      return res.status(400).json({ error: true, message: "User not found" });
+      return res.status(400).json({ error: true, message: errors.userNotFound });
     }
 
     const isPasswordValid = await bcrypt.compare(password, userInfo.password);
@@ -41,9 +41,9 @@ exports.login = async (req, res, next) => {
       const accessToken = jwt.sign({ user }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "1h" });
 
       logger.info(`User ${email} logged in successfully`);
-      return res.json({ error: false, message: "Login successful", email, accessToken });
+      return res.json({ error: false, message: success.login, email, accessToken });
     } else {
-      return res.status(400).json({ error: true, message: "Invalid credentials" });
+      return res.status(400).json({ error: true, message: errors.invalidCredentials });
     }
   } catch (error) {
     logger.error(`Error during login: ${error.message}`);

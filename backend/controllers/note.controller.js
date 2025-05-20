@@ -1,13 +1,14 @@
 const Note = require("../models/note.model");
 const { findUserNote, findAndUpdateNote } = require("../helpers/noteHelpers");
 const logger = require("../logger");
+const { errors, success } = require("../config/messages");
 
 exports.addNote = async (req, res, next) => {
   const { title, content, tags, isPinned } = req.body;
   const user = req.user;
 
   if (!title || !content) {
-    return res.status(400).json({ error: true, message: "Title and content are required" });
+    return res.status(400).json({ error: true, message: errors.titleContentRequired });
   };
 
   try {
@@ -21,7 +22,7 @@ exports.addNote = async (req, res, next) => {
 
     await note.save();
     logger.info(`Note added by user: ${user.email}`);
-    return res.json({ error: false, note, message: "Note added successfully" });
+    return res.json({ error: false, note, message: success.noteAdded });
   } catch (error) {
     logger.error(`Error adding note: ${error.message}`);
     next(error);
@@ -41,7 +42,7 @@ exports.editNote = async (req, res) => {
     const note = await Note.findOne({ _id: noteId, userId: user._id });
 
     if (!note) {
-      return res.status(404).json({ error: true, message: "Note not found" });
+      return res.status(404).json({ error: true, message: errors.noteNotFound });
     }
 
     if (title) {
@@ -65,9 +66,9 @@ exports.editNote = async (req, res) => {
     };
 
     await note.save();
-    return res.json({ error: false, note, message: "Note updated successfully" });
+    return res.json({ error: false, note, message: success.noteUpdated });
   } catch (error) {
-    return res.status(500).json({ error: true, message: "Internal server error" });
+    return res.status(500).json({ error: true, message: errors.internal });
   }
 };
 
@@ -76,7 +77,7 @@ exports.getAllNotes = async (req, res) => {
   const { searchQuery, tags, sortBy, page = 1, limit = 10 } = req.query;
 
   if (!user || !user._id) {
-    return res.status(400).json({ error: true, message: "User not authenticated or missing user ID" });
+    return res.status(400).json({ error: true, message: errors.authRequired });
   };
 
   try {
@@ -118,10 +119,10 @@ exports.getAllNotes = async (req, res) => {
       currentPage: Number(page),
       totalPages: Math.ceil(totalCount / limit),
       totalCount,
-      message: "Notes retrieved successfully"
+      message: success.notesFetched
     });
   } catch (error) {
-    return res.status(500).json({ error: true, message: "Internal server error" });
+    return res.status(500).json({ error: true, message: errors.internal });
   }
 };
 
@@ -133,13 +134,13 @@ exports.deleteNote = async (req, res) => {
     const note = await findUserNote(noteId, user._id);
 
     if (!note) {
-      return res.status(404).json({ error: true, message: "Note not found" });
+      res.status(404).json({ error: true, message: errors.noteNotFound });
     }
 
     await Note.deleteOne({ _id: noteId, userId: user._id });
-    return res.json({ error: false, message: "Note deleted successfully" });
+    return res.json({ error: false, message: success.noteDeleted });
   } catch (error) {
-    return res.status(500).json({ error: true, message: "Internal server error" });
+    return res.status(500).json({ error: true, message: errors.internal });
   }
 };
 
@@ -150,9 +151,9 @@ exports.updateNotePinned = async (req, res) => {
 
   try {
     const note = await findAndUpdateNote(noteId, user._id, { isPinned });
-    return res.json({ error: false, note, message: "Note updated successfully" });
+    return res.json({ error: false, message: success.noteUpdated });
   } catch (error) {
-    return res.status(500).json({ error: true, message: "Internal server error" });
+    return res.status(500).json({ error: true, message: errors.internal });
   }
 };
 
@@ -164,9 +165,9 @@ exports.archiveNote = async (req, res) => {
   try {
     const note = await findAndUpdateNote(noteId, user._id, { isArchived });
     const msg = isArchived ? "Note archived successfully" : "Note unarchived successfully";
-    return res.json({ error: false, note, message: msg });
+    return res.json({ error: false, message: success.archived });
   } catch (error) {
-    return res.status(404).json({ error: true, message: error.message });
+    return res.status(500).json({ error: true, message: errors.internal });
   }
 };
 
@@ -178,9 +179,9 @@ exports.completeNote = async (req, res) => {
   try {
     const note = await findAndUpdateNote(noteId, user._id, { isCompleted });
     const msg = isCompleted ? "Note marked as completed" : "Note marked as incomplete";
-    return res.json({ error: false, note, message: msg });
+    return res.json({ error: false, message: success.completed });
   } catch (error) {
-    return res.status(404).json({ error: true, message: error.message });
+    return res.status(500).json({ error: true, message: errors.internal });
   }
 };
 
@@ -190,14 +191,14 @@ exports.addLabel = async (req, res) => {
   const user = req.user;
 
   if (!label || label.trim() === "") {
-    return res.status(400).json({ error: true, message: "Label is required" });
+    return res.status(400).json({ error: true, message: errors.labelRequired });
   };
 
   try {
     const note = await Note.findOne({ _id: noteId, userId: user._id });
 
     if (!note) {
-      return res.status(404).json({ error: true, message: "Note not found" });
+      return res.status(404).json({ error: true, message: errors.noteNotFound });
     };
 
     if (!note.tags.includes(label)) {
@@ -205,9 +206,9 @@ exports.addLabel = async (req, res) => {
       await note.save();
     };
 
-    return res.json({ error: false, note, message: "Label added successfully" });
+    return res.json({ error: false, note, message: success.labelAdded });
   } catch (error) {
-    return res.status(500).json({ error: true, message: "Internal server error" });
+    return res.status(500).json({ error: true, message: errors.internal });
   }
 };
 
@@ -217,23 +218,22 @@ exports.removeLabel = async (req, res) => {
   const user = req.user;
 
   if (!label || label.trim() === "") {
-    return res.status(400).json({ error: true, message: "Label is required" });
-  }
+    return res.status(400).json({ error: true, message: errors.labelRequired });
+  };
 
   try {
     const note = await Note.findOne({ _id: noteId, userId: user._id });
 
     if (!note) {
-      return res.status(404).json({ error: true, message: "Note not found" });
-    }
+      return res.status(404).json({ error: true, message: errors.noteNotFound });
+    };
 
     note.tags = note.tags.filter((tag) => tag !== label);
     await note.save();
-
-    return res.json({ error: false, note, message: "Label removed successfully" });
+    return res.json({ error: false, note, message: success.labelRemoved });
   } catch (error) {
-    return res.status(500).json({ error: true, message: "Internal server error" });
-  }
+    return res.status(500).json({ error: true, message: errors.internal });
+  };
 };
 
 exports.setReminder = async (req, res) => {
@@ -243,9 +243,9 @@ exports.setReminder = async (req, res) => {
 
   try {
     const note = await findAndUpdateNote(noteId, user._id, { reminder });
-    return res.json({ error: false, note, message: "Reminder set successfully" });
+    return res.json({ error: false, note, message: success.reminderSet });
   } catch (error) {
-    return res.status(404).json({ error: true, message: error.message });
+    return res.status(404).json({ error: true, message: error.message || errors.noteNotFound });
   };
 };
 
@@ -255,22 +255,22 @@ exports.shareNote = async (req, res) => {
   const user = req.user;
 
   if (!emails || !Array.isArray(emails) || emails.length === 0) {
-    return res.status(400).json({ error: true, message: "Emails are required" });
+    return res.status(400).json({ error: true, message: errors.emailsRequired });
   };
 
   try {
     const note = await Note.findOne({ _id: noteId, userId: user._id });
 
     if (!note) {
-      return res.status(404).json({ error: true, message: "Note not found or access denied" });
+      return res.status(404).json({ error: true, message: errors.noteNotFound });
     };
 
     const newEmails = emails.filter(email => !note.sharedWith.includes(email));
     note.sharedWith.push(...newEmails);
     await note.save();
 
-    return res.json({ error: false, note, message: "Note shared successfully" });
+    return res.json({ error: false, note, message: success.noteShared });
   } catch (error) {
-    return res.status(500).json({ error: true, message: "Internal server error" });
+    return res.status(500).json({ error: true, message: errors.internal });
   };
 };
