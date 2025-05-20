@@ -1,5 +1,5 @@
 const Note = require("../models/note.model");
-const User = require("../models/user.model");
+const { findUserNote, findAndUpdateNote } = require("../helpers/noteHelpers");
 const logger = require("../logger");
 
 exports.addNote = async (req, res, next) => {
@@ -7,10 +7,8 @@ exports.addNote = async (req, res, next) => {
   const user = req.user;
 
   if (!title || !content) {
-    const error = new Error("Title and content are required");
-    error.status = 400;
-    return next(error);
-  }
+    return res.status(400).json({ error: true, message: "Title and content are required" });
+  };
 
   try {
     const note = new Note({
@@ -46,14 +44,27 @@ exports.editNote = async (req, res) => {
       return res.status(404).json({ error: true, message: "Note not found" });
     }
 
-    if (title) note.title = title;
-    if (content) note.content = content;
-    if (tags && Array.isArray(tags)) note.tags = tags;
-    if (reminder) note.reminder = reminder;
-    if (isPinned !== undefined) note.isPinned = isPinned;
+    if (title) {
+      note.title = title;
+    };
+
+    if (content) {
+      note.content = content;
+    };
+
+    if (Array.isArray(tags)) {
+      note.tags = tags;
+    };
+
+    if (reminder) {
+      note.reminder = reminder;
+    };
+
+    if (typeof isPinned !== "undefined") {
+      note.isPinned = isPinned;
+    };
 
     await note.save();
-
     return res.json({ error: false, note, message: "Note updated successfully" });
   } catch (error) {
     return res.status(500).json({ error: true, message: "Internal server error" });
@@ -65,11 +76,8 @@ exports.getAllNotes = async (req, res) => {
   const { searchQuery, tags, sortBy } = req.query;
 
   if (!user || !user._id) {
-    return res.status(400).json({
-      error: true,
-      message: "User not authenticated or missing user ID",
-    });
-  }
+    return res.status(400).json({ error: true, message: "User not authenticated or missing user ID" });
+  };
 
   try {
     let filter = {
@@ -99,7 +107,6 @@ exports.getAllNotes = async (req, res) => {
     }
 
     const notes = await Note.find(filter).sort(sortOptions);
-
     return res.json({ error: false, notes, message: "All notes retrieved successfully" });
   } catch (error) {
     return res.status(500).json({ error: true, message: "Internal server error" });
@@ -111,14 +118,13 @@ exports.deleteNote = async (req, res) => {
   const user = req.user;
 
   try {
-    const note = await Note.findOne({ _id: noteId, userId: user._id });
+    const note = await findUserNote(noteId, user._id);
 
     if (!note) {
       return res.status(404).json({ error: true, message: "Note not found" });
     }
 
     await Note.deleteOne({ _id: noteId, userId: user._id });
-
     return res.json({ error: false, message: "Note deleted successfully" });
   } catch (error) {
     return res.status(500).json({ error: true, message: "Internal server error" });
@@ -131,16 +137,7 @@ exports.updateNotePinned = async (req, res) => {
   const user = req.user;
 
   try {
-    const note = await Note.findOne({ _id: noteId, userId: user._id });
-
-    if (!note) {
-      return res.status(404).json({ error: true, message: "Note not found" });
-    }
-
-    note.isPinned = isPinned;
-
-    await note.save();
-
+    const note = await findAndUpdateNote(noteId, user._id, { isPinned });
     return res.json({ error: false, note, message: "Note updated successfully" });
   } catch (error) {
     return res.status(500).json({ error: true, message: "Internal server error" });
@@ -153,22 +150,11 @@ exports.archiveNote = async (req, res) => {
   const user = req.user;
 
   try {
-    const note = await Note.findOne({ _id: noteId, userId: user._id });
-
-    if (!note) {
-      return res.status(404).json({ error: true, message: "Note not found" });
-    }
-
-    note.isArchived = isArchived;
-    await note.save();
-
-    return res.json({
-      error: false,
-      note,
-      message: isArchived ? "Note archived successfully" : "Note unarchived successfully",
-    });
+    const note = await findAndUpdateNote(noteId, user._id, { isArchived });
+    const msg = isArchived ? "Note archived successfully" : "Note unarchived successfully";
+    return res.json({ error: false, note, message: msg });
   } catch (error) {
-    return res.status(500).json({ error: true, message: "Internal server error" });
+    return res.status(404).json({ error: true, message: error.message });
   }
 };
 
@@ -178,22 +164,11 @@ exports.completeNote = async (req, res) => {
   const user = req.user;
 
   try {
-    const note = await Note.findOne({ _id: noteId, userId: user._id });
-
-    if (!note) {
-      return res.status(404).json({ error: true, message: "Note not found" });
-    }
-
-    note.isCompleted = isCompleted;
-    await note.save();
-
-    return res.json({
-      error: false,
-      note,
-      message: isCompleted ? "Note marked as completed" : "Note marked as incomplete",
-    });
+    const note = await findAndUpdateNote(noteId, user._id, { isCompleted });
+    const msg = isCompleted ? "Note marked as completed" : "Note marked as incomplete";
+    return res.json({ error: false, note, message: msg });
   } catch (error) {
-    return res.status(500).json({ error: true, message: "Internal server error" });
+    return res.status(404).json({ error: true, message: error.message });
   }
 };
 
@@ -204,19 +179,19 @@ exports.addLabel = async (req, res) => {
 
   if (!label || label.trim() === "") {
     return res.status(400).json({ error: true, message: "Label is required" });
-  }
+  };
 
   try {
     const note = await Note.findOne({ _id: noteId, userId: user._id });
 
     if (!note) {
       return res.status(404).json({ error: true, message: "Note not found" });
-    }
+    };
 
     if (!note.tags.includes(label)) {
       note.tags.push(label);
       await note.save();
-    }
+    };
 
     return res.json({ error: false, note, message: "Label added successfully" });
   } catch (error) {
@@ -255,19 +230,11 @@ exports.setReminder = async (req, res) => {
   const user = req.user;
 
   try {
-    const note = await Note.findOne({ _id: noteId, userId: user._id });
-
-    if (!note) {
-      return res.status(404).json({ error: true, message: "Note not found" });
-    }
-
-    note.reminder = reminder;
-    await note.save();
-
+    const note = await findAndUpdateNote(noteId, user._id, { reminder });
     return res.json({ error: false, note, message: "Reminder set successfully" });
   } catch (error) {
-    return res.status(500).json({ error: true, message: "Internal server error" });
-  }
+    return res.status(404).json({ error: true, message: error.message });
+  };
 };
 
 exports.shareNote = async (req, res) => {
