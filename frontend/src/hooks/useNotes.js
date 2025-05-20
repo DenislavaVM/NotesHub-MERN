@@ -1,14 +1,14 @@
 import { useState } from "react";
+import { useError } from "../hooks/useError";
 import apiClient from "../utils/apiClient";
 
 export const useNotes = () => {
+    const { showError } = useError();
     const [notes, setNotes] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
 
     const fetchNotes = async ({ searchQuery = "", tags = [], sortBy = "" } = {}) => {
         setLoading(true);
-        setError(null);
 
         try {
             const response = await apiClient.get("/get-all-notes", {
@@ -20,7 +20,7 @@ export const useNotes = () => {
             });
             setNotes(response.data.notes || []);
         } catch (err) {
-            setError(err.response?.data?.message || "Failed to fetch notes");
+            showError(err.response?.data?.message || "Failed to fetch notes");
         } finally {
             setLoading(false);
         }
@@ -31,7 +31,8 @@ export const useNotes = () => {
             await apiClient.delete(`/delete-note/${noteId}`);
             setNotes((prev) => prev.filter((n) => n._id !== noteId));
         } catch (err) {
-            throw new Error(err.response?.data?.message || "Delete failed");
+            showError(err.response?.data?.message || "Delete failed");
+            throw err;
         }
     };
 
@@ -43,14 +44,14 @@ export const useNotes = () => {
                 prev.map((note) => (note._id === noteId ? { ...note, ...updatedNote } : note))
             );
         } catch (err) {
-            throw new Error("Pin update failed");
+            showError("Pin update failed");
+            throw err;
         }
     };
 
     return {
         notes,
         loading,
-        error,
         fetchNotes,
         deleteNote,
         togglePinNote,

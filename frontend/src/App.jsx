@@ -7,20 +7,23 @@ import Login from "./pages/Login/Login";
 import SignUp from "./pages/SingUp/SignUp";
 import Labels from "./pages/Labels/Labels";
 import PrivateRoute from "./routes/PrivateRoute";
+import { ErrorProvider } from "./context/ErrorProvider";
 
 const App = () => {
   return (
-    <Router>
-      <Routes>
-        <Route path="/dashboard" element={<PrivateRoute><Home /></PrivateRoute>} />
-        <Route path="/labels" element={<PrivateRoute><Labels /></PrivateRoute>} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/" element={<Navigate to="/login" />} />
-      </Routes>
+    <ErrorProvider>
+      <Router>
+        <Routes>
+          <Route path="/dashboard" element={<PrivateRoute><Home /></PrivateRoute>} />
+          <Route path="/labels" element={<PrivateRoute><Labels /></PrivateRoute>} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/" element={<Navigate to="/login" />} />
+        </Routes>
 
-      <ToastContainer position="top-center" autoClose={3000} />
-    </Router>
+        <ToastContainer position="top-center" autoClose={3000} />
+      </Router>
+    </ErrorProvider>
   );
 };
 
