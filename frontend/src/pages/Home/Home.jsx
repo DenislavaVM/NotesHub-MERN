@@ -36,9 +36,10 @@ const Home = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [tags, setTags] = useState([]);
   const [sortBy, setSortBy] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
 
-  const { notes, fetchNotes, deleteNote, togglePinNote, } = useNotes();
+  const { notes, fetchNotes, deleteNote, togglePinNote, pagination } = useNotes();
 
   const handleEdit = (noteDetails) => {
     setOpenAddEditModal({ isShown: true, data: noteDetails, type: "edit" });
@@ -83,6 +84,7 @@ const Home = () => {
     setSearchQuery(query);
     setTags(tagsArray || []);
     setIsSearch(true);
+    setCurrentPage(1);
   };
 
   const handleDelete = async (note) => {
@@ -107,6 +109,11 @@ const Home = () => {
     setIsSearch(false);
     setSearchQuery("");
     setTags([]);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
   };
 
   useEffect(() => {
@@ -115,8 +122,8 @@ const Home = () => {
 
   const tagKey = tags.join(",");
   useEffect(() => {
-    fetchNotes({ searchQuery, tags, sortBy });
-  }, [searchQuery, tagKey, sortBy]);
+    fetchNotes({ searchQuery, tags, sortBy, page: currentPage });
+  }, [searchQuery, tagKey, sortBy, currentPage]);
 
   return (
     <>
@@ -159,6 +166,20 @@ const Home = () => {
               />
             )}
           </div>
+
+          {pagination && pagination.totalPages > 1 && (
+            <div className="pagination-container">
+              {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((page) => (
+                <button
+                  key={page}
+                  className={`pagination-button ${currentPage === page ? "active" : ""}`}
+                  onClick={() => handlePageChange(page)}
+                >
+                  {page}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
