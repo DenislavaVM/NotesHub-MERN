@@ -1,62 +1,46 @@
 import React, { useEffect, useState } from "react";
-import "./Labels.css";
-import apiClient from "../../utils/apiClient";
 import { TextField, Button, IconButton, List, ListItem, ListItemText } from "@mui/material";
 import { MdDelete, MdEdit } from "react-icons/md";
+import { useLabels } from "../../hooks/useLabels";
+import "./Labels.css";
 
 const Labels = () => {
-    const [labels, setLabels] = useState([]);
+    const { labels, createLabel, updateLabel, deleteLabel, error, } = useLabels();
     const [newLabel, setNewLabel] = useState("");
     const [editLabelId, setEditLabelId] = useState(null);
     const [editLabelName, setEditLabelName] = useState("");
-    const [error, setError] = useState("");
+    const [formError, setFormError] = useState("");
 
-    const fetchLabels = async () => {
-        try {
-            const response = await apiClient.get("/labels");
-            if (response.data && response.data.labels) {
-                setLabels(response.data.labels);
-            }
-        } catch (err) {
-            console.error("Failed to load labels", err);
-        }
-    };
+    const handleCreate = async () => {
+        if (!newLabel.trim()) {
+            setFormError("Label cannot be empty");
+            return;
+        };
 
-    const createLabel = async () => {
-        if (!newLabel.trim()) return;
         try {
-            await apiClient.post("/labels", { name: newLabel });
+            await createLabel(newLabel);
             setNewLabel("");
-            fetchLabels();
+            setFormError("");
         } catch (err) {
-            setError(err.response?.data?.message || "Failed to create label");
+            setFormError(err.response?.data?.message || "Failed to create label");
         }
     };
 
-    const updateLabel = async () => {
-        if (!editLabelName.trim()) return;
+    const handleUpdate = async () => {
+        if (!editLabelName.trim()) {
+            setFormError("Label cannot be empty");
+            return;
+        };
+
         try {
-            await apiClient.put(`/labels/${editLabelId}`, { name: editLabelName });
+            await updateLabel(editLabelId, editLabelName);
             setEditLabelId(null);
             setEditLabelName("");
-            fetchLabels();
+            setFormError("");
         } catch (err) {
-            setError(err.response?.data?.message || "Failed to update label");
+            setFormError(err.response?.data?.message || "Failed to update label");
         }
     };
-
-    const deleteLabel = async (labelId) => {
-        try {
-            await apiClient.delete(`/labels/${labelId}`);
-            fetchLabels();
-        } catch (err) {
-            console.error("Failed to delete label");
-        }
-    };
-
-    useEffect(() => {
-        fetchLabels();
-    }, []);
 
     return (
         <div className="labels-page">
@@ -70,10 +54,12 @@ const Labels = () => {
                     value={newLabel}
                     onChange={(e) => setNewLabel(e.target.value)}
                 />
-                <Button variant="contained" onClick={createLabel}>Add</Button>
+                <Button variant="contained" onClick={handleCreate}>Add</Button>
             </div>
 
-            {error && <p className="error-message">{error}</p>}
+            {(formError || error) && (
+                <p className="error-message">{formError || error}</p>
+            )}
 
             <List>
                 {labels.map((label) => (
@@ -85,7 +71,7 @@ const Labels = () => {
                                     value={editLabelName}
                                     onChange={(e) => setEditLabelName(e.target.value)}
                                 />
-                                <Button onClick={updateLabel}>Save</Button>
+                                <Button onClick={handleUpdate}>Save</Button>
                                 <Button onClick={() => setEditLabelId(null)}>Cancel</Button>
                             </>
                         ) : (

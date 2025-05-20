@@ -1,18 +1,21 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { MdAdd } from "react-icons/md";
+import { Fab, Button, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+import NoDataImg from "../../assets/images/no-data.svg";
+
+import apiClient from "../../utils/apiClient";
+import { useAuth } from "../../hooks/useAuth";
+import { useNotes } from "../../hooks/useNotes";
+
 import Navbar from "../../components/Navbar/Navbar";
 import NoteCard from "../../components/Cards/NoteCard";
-import { MdAdd } from "react-icons/md";
-import "./Home.css";
 import AddEditNotes from "./AddEditNotes";
-import Modal from "react-modal";
-import { useNavigate } from "react-router-dom";
-import apiClient from "../../utils/apiClient";
 import Notification from "../../components/Notification/Notification";
 import EmptyCard from "../../components/EmptyCard/EmptyCard";
 import AddNotesImg from "../../assets/images/add-notes.svg";
-import NoDataImg from "../../assets/images/no-data.svg";
-import { Fab, Button, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
-import { useAuth } from "../../hooks/useAuth";
+
+import "./Home.css";
 
 const Home = () => {
   const [openAddEditModel, setOpenAddEditModal] = useState({
@@ -28,13 +31,14 @@ const Home = () => {
   });
 
   const { setUser } = useAuth();
-  const [allNotes, setAllNotes] = useState([]);
   const [userInfo, setUserInfo] = useState(null);
   const [isSearch, setIsSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [tags, setTags] = useState([]);
   const [sortBy, setSortBy] = useState("");
   const navigate = useNavigate();
+
+  const { notes, fetchNotes, deleteNote, togglePinNote, } = useNotes();
 
   const handleEdit = (noteDetails) => {
     setOpenAddEditModal({ isShown: true, data: noteDetails, type: "edit" });
@@ -57,6 +61,11 @@ const Home = () => {
 
   const getUserInfo = async () => {
     try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        return;
+      };
+
       const response = await apiClient.get("/get-user");
       if (response.data) {
         setUser(response.data);
@@ -70,68 +79,26 @@ const Home = () => {
     }
   };
 
-  const getAllNotes = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      return;
-    };
+  const handleSearch = (query, tagsArray) => {
+    setSearchQuery(query);
+    setTags(tagsArray || []);
+    setIsSearch(true);
+  };
 
-    const validTags = Array.isArray(tags) ? tags : [];
-
+  const handleDelete = async (note) => {
     try {
-      const response = await apiClient.get("/get-all-notes", {
-        params: {
-          searchQuery: searchQuery || "",
-          tags: validTags.length > 0 ? validTags.join(",") : "",
-          sortBy: sortBy || "",
-        },
-      });
-
-      if (response.data && response.data.notes) {
-        setAllNotes(response.data.notes);
-      } else {
-        throw new Error("Unexpected response format");
-      }
-    } catch (error) {
+      await deleteNote(note._id);
+      showNotificationMessage("Note deleted successfully", "delete");
+    } catch {
       console.log("An unexpected error occurred. Please try again.");
     }
   };
 
-  const handleSearch = (searchQuery, tagsArray) => {
-    setSearchQuery(searchQuery);
-    setTags(tagsArray || []);
-    setIsSearch(true);
-    getAllNotes();
-  };
-
-  const handleDelete = async (data) => {
-    const noteId = data._id;
+  const handlePin = async (note) => {
     try {
-      const response = await apiClient.delete("/delete-note/" + noteId);
-
-      if (response.data && !response.data.error) {
-        showNotificationMessage("Note deleted successfully", "delete");
-        getAllNotes();
-      }
-    } catch (error) {
-      if (error.response && error.response.data && error.response.data.message) {
-        console.log("An unexpected error occurred. Please try again.");
-      }
-    }
-  };
-
-  const handlePin = async (noteData) => {
-    const noteId = noteData._id;
-    try {
-      const response = await apiClient.put("/update-note-pinned/" + noteId, {
-        isPinned: !noteData.isPinned,
-      });
-
-      if (response.data && response.data.note) {
-        showNotificationMessage("Note updated successfully");
-        getAllNotes();
-      }
-    } catch (error) {
+      await togglePinNote(note._id, !note.isPinned);
+      showNotificationMessage("Note updated successfully", "update");
+    } catch {
       console.log("An unexpected error occurred. Please try again.");
     }
   };
@@ -140,12 +107,16 @@ const Home = () => {
     setIsSearch(false);
     setSearchQuery("");
     setTags([]);
-    getAllNotes();
   };
 
   useEffect(() => {
-    getAllNotes();
-  }, [searchQuery, tags, sortBy]);
+    getUserInfo();
+  }, []);
+
+  const tagKey = tags.join(",");
+  useEffect(() => {
+    fetchNotes({ searchQuery, tags, sortBy });
+  }, [searchQuery, tagKey, sortBy]);
 
   return (
     <>
@@ -159,11 +130,11 @@ const Home = () => {
 
       <div className="home-container">
         <div
-          className={`home-container ${allNotes.length === 0 ? "empty" : ""}`}
+          className={`home-container ${notes.length === 0 ? "empty" : ""}`}
         >
-          <div className={`note-grid ${allNotes.length === 0 ? "empty-grid" : ""}`}>
-            {allNotes && allNotes.length > 0 ? (
-              allNotes.map((note) => (
+          <div className={`note-grid ${notes.length === 0 ? "empty-grid" : ""}`}>
+            {notes.length > 0 ? (
+              notes.map((note) => (
                 <NoteCard
                   key={note._id}
                   title={note.title}
@@ -207,7 +178,7 @@ const Home = () => {
             type={openAddEditModel.type}
             noteData={openAddEditModel.data}
             onClose={() => setOpenAddEditModal({ isShown: false, type: "add", data: null })}
-            getAllNotes={getAllNotes}
+            getAllNotes={() => fetchNotes({ searchQuery, tags, sortBy })}
             showNotificationMessage={showNotificationMessage}
           />
         </DialogContent>
