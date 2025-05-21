@@ -5,7 +5,7 @@ import { useLabels } from "../../hooks/useLabels";
 import "./Labels.css";
 
 const Labels = () => {
-    const { labels, createLabel, updateLabel, deleteLabel, error, } = useLabels();
+    const { labels, loading, createLabel, updateLabel, deleteLabel, error, } = useLabels();
     const [newLabel, setNewLabel] = useState("");
     const [editLabelId, setEditLabelId] = useState(null);
     const [editLabelName, setEditLabelName] = useState("");
@@ -61,36 +61,43 @@ const Labels = () => {
                 <p className="error-message">{formError || error}</p>
             )}
 
-            <List>
-                {labels.map((label) => (
-                    <ListItem key={label._id} divider>
-                        {editLabelId === label._id ? (
-                            <>
-                                <TextField
-                                    size="small"
-                                    value={editLabelName}
-                                    onChange={(e) => setEditLabelName(e.target.value)}
-                                />
-                                <Button onClick={handleUpdate}>Save</Button>
-                                <Button onClick={() => setEditLabelId(null)}>Cancel</Button>
-                            </>
-                        ) : (
-                            <>
-                                <ListItemText primary={label.name} />
-                                <IconButton onClick={() => {
-                                    setEditLabelId(label._id);
-                                    setEditLabelName(label.name);
-                                }}>
-                                    <MdEdit />
-                                </IconButton>
-                                <IconButton onClick={() => deleteLabel(label._id)}>
-                                    <MdDelete />
-                                </IconButton>
-                            </>
-                        )}
-                    </ListItem>
-                ))}
-            </List>
+            {loading ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                    <div key={i} className="label-skeleton shimmer" />
+                ))
+            ) : (
+                <List>
+                    {labels.map((label) => (
+                        <ListItem key={label._id} divider>
+                            {editLabelId === label._id ? (
+                                <>
+                                    <TextField
+                                        size="small"
+                                        value={editLabelName}
+                                        onChange={(e) => setEditLabelName(e.target.value)}
+                                    />
+                                    <Button onClick={handleUpdate}>Save</Button>
+                                    <Button onClick={() => setEditLabelId(null)}>Cancel</Button>
+                                </>
+                            ) : (
+                                <>
+                                    <ListItemText primary={label.name} />
+                                    <IconButton onClick={() => {
+                                        setEditLabelId(label._id);
+                                        setEditLabelName(label.name);
+                                    }}>
+                                        <MdEdit />
+                                    </IconButton>
+                                    <IconButton onClick={() => deleteLabel(label._id)}>
+                                        <MdDelete />
+                                    </IconButton>
+                                </>
+                            )}
+                        </ListItem>
+                    ))}
+                </List>
+            )}
+
         </div>
     );
 };

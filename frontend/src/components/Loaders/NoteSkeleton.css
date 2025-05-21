@@ -1,0 +1,52 @@
+.note-card.skeleton {
+    border: 1px solid var(--light-gray);
+    border-radius: 12px;
+    padding: 1.5rem;
+    background-color: #f3f4f6;
+    position: relative;
+    overflow: hidden;
+}
+
+.skeleton-header,
+.skeleton-content,
+.skeleton-tags {
+    background: #e5e7eb;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+}
+
+.skeleton-header {
+    height: 20px;
+    width: 60%;
+}
+
+.skeleton-content {
+    height: 60px;
+    width: 100%;
+}
+
+.skeleton-tags {
+    height: 20px;
+    width: 40%;
+}
+
+.note-card.skeleton::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -150px;
+    height: 100%;
+    width: 150px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    animation: shimmer 1.2s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}

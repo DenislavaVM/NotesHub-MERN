@@ -14,6 +14,7 @@ import AddEditNotes from "./AddEditNotes";
 import Notification from "../../components/Notification/Notification";
 import EmptyCard from "../../components/EmptyCard/EmptyCard";
 import AddNotesImg from "../../assets/images/add-notes.svg";
+import NoteSkeleton from "../../components/Loaders/NoteSkeleton";
 
 import "./Home.css";
 
@@ -39,7 +40,7 @@ const Home = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
 
-  const { notes, fetchNotes, deleteNote, togglePinNote, pagination } = useNotes();
+  const { notes, loading, fetchNotes, deleteNote, togglePinNote, pagination } = useNotes();
 
   const handleEdit = (noteDetails) => {
     setOpenAddEditModal({ isShown: true, data: noteDetails, type: "edit" });
@@ -140,7 +141,9 @@ const Home = () => {
           className={`home-container ${notes.length === 0 ? "empty" : ""}`}
         >
           <div className={`note-grid ${notes.length === 0 ? "empty-grid" : ""}`}>
-            {notes.length > 0 ? (
+            {loading ? (
+              Array.from({ length: 6 }).map((_, idx) => <NoteSkeleton key={idx} />)
+            ) : notes.length > 0 ? (
               notes.map((note) => (
                 <NoteCard
                   key={note._id}
