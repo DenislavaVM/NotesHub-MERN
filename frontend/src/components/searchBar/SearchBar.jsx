@@ -35,6 +35,10 @@ const SearchBar = ({ value, onChange, handleSearch, onClearSearch, setSortBy, so
   }, [value, tagInput, debounceSearch]);
 
   const handleSearchClick = () => {
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout);
+    };
+
     const searchQuery = value;
     const tagsArray = tagInput
       .split(",")
@@ -46,6 +50,7 @@ const SearchBar = ({ value, onChange, handleSearch, onClearSearch, setSortBy, so
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
+      e.preventDefault();
       handleSearchClick();
     }
   };
