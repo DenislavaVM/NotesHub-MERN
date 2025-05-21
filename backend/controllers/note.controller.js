@@ -21,8 +21,12 @@ exports.addNote = async (req, res, next) => {
     });
 
     await note.save();
+    const populatedNote = await Note.findById(note._id)
+      .populate("userId", "firstName lastName email")
+      .populate("tags", "name");
+
     logger.info(`Note added by user: ${user.email}`);
-    return res.json({ error: false, note, message: success.noteAdded });
+    return res.json({ error: false, note: populatedNote, message: success.noteAdded });
   } catch (error) {
     logger.error(`Error adding note: ${error.message}`);
     next(error);
@@ -36,14 +40,14 @@ exports.editNote = async (req, res) => {
 
   if (!title && !content && !tags && typeof isPinned === "undefined" && !reminder) {
     return res.status(400).json({ error: false, message: "No changes provided" });
-  }
+  };
 
   try {
     const note = await Note.findOne({ _id: noteId, userId: user._id });
 
     if (!note) {
       return res.status(404).json({ error: true, message: errors.noteNotFound });
-    }
+    };
 
     if (title) {
       note.title = title;
@@ -66,7 +70,11 @@ exports.editNote = async (req, res) => {
     };
 
     await note.save();
-    return res.json({ error: false, note, message: success.noteUpdated });
+    const populatedNote = await Note.findById(note._id)
+      .populate("userId", "firstName lastName email")
+      .populate("tags", "name");
+
+    return res.json({ error: false, note: populatedNote, message: success.noteUpdated });
   } catch (error) {
     return res.status(500).json({ error: true, message: errors.internal });
   }
@@ -109,6 +117,8 @@ exports.getAllNotes = async (req, res) => {
 
     const totalCount = await Note.countDocuments(filter);
     const notes = await Note.find(filter)
+      .populate("userId", "firstName lastName email")
+      .populate("tags", "name")
       .sort(sortOptions)
       .skip((page - 1) * limit)
       .limit(parseInt(limit));
@@ -268,8 +278,11 @@ exports.shareNote = async (req, res) => {
     const newEmails = emails.filter(email => !note.sharedWith.includes(email));
     note.sharedWith.push(...newEmails);
     await note.save();
+    const populatedNote = await Note.findById(note._id)
+      .populate("userId", "firstName lastName email")
+      .populate("tags", "name");
 
-    return res.json({ error: false, note, message: success.noteShared });
+    return res.json({ error: false, note: populatedNote, message: success.noteShared });
   } catch (error) {
     return res.status(500).json({ error: true, message: errors.internal });
   };

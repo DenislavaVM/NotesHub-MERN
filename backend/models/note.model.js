@@ -5,10 +5,10 @@ const Schema = mongoose.Schema;
 const noteSchema = new Schema({
     title: { type: String, required: true },
     content: { type: String, required: true },
-    tags: { type: [String], default: [] },
+    tags: [{ type: Schema.Types.ObjectId, ref: "Label" }],
     isPinned: { type: Boolean, required: false },
-    userId: { type: String, required: true },
-    sharedWith: { type: [String], default: [] },
+    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    sharedWith: [{ type: String }],
     createdOn: { type: Date, default: Date.now },
     isArchived: { type: Boolean, default: false },
     isCompleted: { type: Boolean, default: false },
