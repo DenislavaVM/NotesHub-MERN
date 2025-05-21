@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const logger = require("../logger");
 const { errors, success } = require("../config/messages");
+const { JWT_SECRET, TOKEN_EXPIRATION } = require("../config/jwtConfig");
 
 exports.createAccount = async (req, res, next) => {
   const { firstName, lastName, email, password } = req.body;
@@ -17,7 +18,11 @@ exports.createAccount = async (req, res, next) => {
     const user = new User({ firstName, lastName, email, password: hashedPassword });
     await user.save();
 
-    const accessToken = jwt.sign({ user: { _id: user._id, firstName, lastName, email } }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "1h" });
+    const accessToken = jwt.sign(
+      { user: { _id: user._id, firstName, lastName, email } },
+      JWT_SECRET,
+      { expiresIn: TOKEN_EXPIRATION }
+    );
 
     logger.info(`New user created: ${email}`);
     return res.json({ error: false, user, accessToken, message: success.registration });
@@ -39,7 +44,7 @@ exports.login = async (req, res, next) => {
     const isPasswordValid = await bcrypt.compare(password, userInfo.password);
     if (isPasswordValid) {
       const user = { _id: userInfo._id, firstName: userInfo.firstName, lastName: userInfo.lastName, email: userInfo.email };
-      const accessToken = jwt.sign({ user }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "1h" });
+      const accessToken = jwt.sign({ user }, JWT_SECRET, { expiresIn: TOKEN_EXPIRATION });
 
       logger.info(`User ${email} logged in successfully`);
       return res.json({ error: false, message: success.login, email, accessToken });
