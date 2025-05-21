@@ -2,6 +2,7 @@ const User = require("../models/user.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const logger = require("../logger");
+const { errors, success } = require("../config/messages");
 
 exports.createAccount = async (req, res, next) => {
   const { firstName, lastName, email, password } = req.body;
