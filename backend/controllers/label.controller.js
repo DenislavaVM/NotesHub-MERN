@@ -4,7 +4,7 @@ const logger = require("../logger");
 exports.getAllLabels = async (req, res) => {
     const userId = req.user._id;
     try {
-        const labels = await Label.find({ userId }).sort({ name: 1 });
+        const labels = await Label.find({ userId }).sort({ name: 1 }).lean();
         return res.json({ error: false, labels });
     } catch (error) {
         logger.error(`Error fetching labels: ${error.message}`);
@@ -21,7 +21,7 @@ exports.createLabel = async (req, res) => {
     };
 
     try {
-        const existing = await Label.findOne({ name, userId });
+        const existing = await Label.findOne({ name, userId }).lean();
         if (existing) {
             return res.status(400).json({ error: true, message: "Label already exists" });
         };
@@ -45,7 +45,7 @@ exports.updateLabel = async (req, res) => {
     };
 
     try {
-        const label = await Label.findOne({ _id: labelId, userId });
+        const label = await Label.findOne({ _id: labelId, userId }).lean();
 
         if (!label) {
             return res.status(404).json({ error: true, message: "Label not found" });

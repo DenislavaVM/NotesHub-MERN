@@ -1,10 +1,11 @@
 const Note = require("../models/note.model");
 const { findUserNote, findAndUpdateNote, getNoteByIdWithUser } = require("../helpers/noteHelpers");
+const Label = require("../models/label.model");
 const logger = require("../logger");
 const { errors, success } = require("../config/messages");
 
 exports.addNote = async (req, res, next) => {
-  const { title, content, tags, isPinned } = req.body;
+  const { title, content, tags = [], isPinned } = req.body;
   const user = req.user;
 
   if (!title || !content) {
@@ -12,10 +13,12 @@ exports.addNote = async (req, res, next) => {
   };
 
   try {
+    const labelDocs = await Label.find({ name: { $in: tags }, userId: user._id });
+    const tagIds = labelDocs.map(label => label._id);
     const note = new Note({
       title,
       content,
-      tags: tags || [],
+      tags: tags,
       isPinned: isPinned || false,
       userId: user._id,
     });
@@ -100,8 +103,12 @@ exports.getAllNotes = async (req, res) => {
 
     if (tags && tags !== "") {
       const tagsArray = tags.split(",").map((tag) => tag.trim());
-      filter.tags = { $in: tagsArray };
-    }
+
+      const labelDocs = await Label.find({ name: { $in: tagsArray } }, "_id");
+      const labelIds = labelDocs.map(label => label._id);
+
+      filter.tags = { $in: labelIds };
+    };
 
     let sortOptions = { isPinned: -1 };
     if (sortBy === "created") {
@@ -116,7 +123,8 @@ exports.getAllNotes = async (req, res) => {
       .populate("tags", "name")
       .sort(sortOptions)
       .skip((page - 1) * limit)
-      .limit(parseInt(limit));
+      .limit(parseInt(limit))
+      .lean();
 
     return res.json({
       error: false,
@@ -200,7 +208,7 @@ exports.addLabel = async (req, res) => {
   };
 
   try {
-    const note = await Note.findOne({ _id: noteId, userId: user._id });
+    const note = await Note.findOne({ _id: noteId, userId: user._id }).lean();
 
     if (!note) {
       return res.status(404).json({ error: true, message: errors.noteNotFound });
@@ -227,7 +235,7 @@ exports.removeLabel = async (req, res) => {
   };
 
   try {
-    const note = await Note.findOne({ _id: noteId, userId: user._id });
+    const note = await Note.findOne({ _id: noteId, userId: user._id }).lean();
 
     if (!note) {
       return res.status(404).json({ error: true, message: errors.noteNotFound });
@@ -264,7 +272,7 @@ exports.shareNote = async (req, res) => {
   };
 
   try {
-    const note = await Note.findOne({ _id: noteId, userId: user._id });
+    const note = await Note.findOne({ _id: noteId, userId: user._id }).lean();
 
     if (!note) {
       return res.status(404).json({ error: true, message: errors.noteNotFound });
