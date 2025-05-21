@@ -21,6 +21,14 @@ app.use(express.json());
 app.use(cors({ origin: "*" }));
 app.use(helmet());
 
+router.get("/", (req, res) => {
+    res.status(200).json({
+        message: "Welcome to NotesHub API",
+        status: "OK",
+        version: "1.0.0",
+    });
+});
+
 app.use("/", routes);
 
 app.use((err, req, res, next) => {
