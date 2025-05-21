@@ -1,4 +1,3 @@
-// backend/index.js
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
@@ -10,14 +9,12 @@ const logger = require("./logger");
 const routes = require("./routes");
 
 const app = express();
+app.set("trust proxy", 1);
 const PORT = process.env.PORT || 3000;
 
 const mongoURI = process.env.MONGO_URI || "mongodb://localhost:27017/notes-app";
 
-mongoose.connect(mongoURI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-});
+mongoose.connect(mongoURI);
 
 app.use(cookieParser());
 app.use(express.json());
