@@ -146,7 +146,7 @@ exports.deleteNote = async (req, res) => {
     const note = await findUserNote(noteId, user._id);
 
     if (!note) {
-      res.status(404).json({ error: true, message: errors.noteNotFound });
+      return res.status(404).json({ error: true, message: errors.noteNotFound });
     }
 
     await Note.deleteOne({ _id: noteId, userId: user._id });
