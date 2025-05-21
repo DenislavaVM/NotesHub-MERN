@@ -147,7 +147,7 @@ const Home = () => {
                   title={note.title}
                   date={note.createdOn}
                   content={note.content}
-                  tags={note.tags.join(", ")}
+                  tags={note.tags.map((tag) => tag.name)}
                   isPinned={note.isPinned}
                   onEdit={() => handleEdit(note)}
                   onDelete={() => handleDelete(note)}

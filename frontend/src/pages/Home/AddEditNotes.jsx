@@ -8,7 +8,9 @@ import "./AddEditNotes.css";
 const AddEditNotes = ({ noteData, type, getAllNotes, onClose, showNotificationMessage }) => {
   const [title, setTitle] = useState(noteData?.title || "");
   const [content, setContent] = useState(noteData?.content || "");
-  const [tags, setTags] = useState(noteData?.tags || []);
+  const [tags, setTags] = useState(
+    noteData?.tags?.map((tag) => (typeof tag === "string" ? tag : tag._id)) || []
+  );
   const [reminder, setReminder] = useState(noteData?.reminder || "");
   const [error, setError] = useState(null);
   const [availableLabels, setAvailableLabels] = useState([]);
@@ -135,11 +137,18 @@ const AddEditNotes = ({ noteData, type, getAllNotes, onClose, showNotificationMe
             multiple
             value={tags}
             onChange={(e) => setTags(e.target.value)}
-            renderValue={(selected) => selected.join(", ")}
+            renderValue={(selected) =>
+              selected
+                .map((id) => {
+                  const label = availableLabels.find((label) => label._id === id);
+                  return label ? label.name : "";
+                })
+                .join(", ")
+            }
           >
             {availableLabels.map((label) => (
-              <MenuItem key={label._id} value={label.name}>
-                <Checkbox checked={tags.includes(label.name)} />
+              <MenuItem key={label._id} value={label._id}>
+                <Checkbox checked={tags.includes(label._id)} />
                 <ListItemText primary={label.name} />
               </MenuItem>
             ))}

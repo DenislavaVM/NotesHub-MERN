@@ -59,8 +59,8 @@ const NoteCard = ({
                         </div>
                     )}
                     <div className="note-tags">
-                        {(Array.isArray(formattedTags) ? formattedTags : []).map((item, index) => (
-                            <span key={index}>#{item}</span>
+                        {Array.isArray(tags) && tags.map((tag, index) => (
+                            <span key={index} className="tag-chip">#{tag}</span>
                         ))}
                     </div>
                     <div className="note-actions">

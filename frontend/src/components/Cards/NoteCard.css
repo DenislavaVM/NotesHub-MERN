@@ -90,6 +90,16 @@
   color: #ef4444;
 }
 
+.tag-chip {
+  display: inline-block;
+  margin: 0 4px 4px 0;
+  padding: 4px 8px;
+  background-color: var(--note-tag-bg);
+  color: var(--note-tag-text);
+  border-radius: 12px;
+  font-size: 12px;
+}
+
 @media (max-width: 600px) {
   .note-card {
     padding: 1rem;
