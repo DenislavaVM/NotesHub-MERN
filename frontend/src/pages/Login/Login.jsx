@@ -25,7 +25,7 @@ const Login = () => {
         const userRes = await apiClient.get("/get-user", {
           headers: { Authorization: `Bearer ${response.data.accessToken}` }
         });
-        setUser(userRes.data);
+        setUser(userRes.data.user);
         navigate("/dashboard");
       };
     } catch (error) {
