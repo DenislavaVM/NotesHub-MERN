@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { MdClose } from "react-icons/md";
 import { FormControl, InputLabel, Select, MenuItem, Checkbox, ListItemText } from "@mui/material";
 import apiClient from "../../utils/apiClient";
@@ -14,6 +14,17 @@ const AddEditNotes = ({ noteData, type, getAllNotes, onClose, showNotificationMe
   const [reminder, setReminder] = useState(noteData?.reminder || "");
   const [error, setError] = useState(null);
   const [availableLabels, setAvailableLabels] = useState([]);
+  const navigate = useNavigate();
+
+  const handleManageLabelsClick = () => {
+    navigate("/labels", {
+      state: {
+        from: "addEditNote",
+        noteData,
+        type: type || "add"
+      }
+    });
+  };
 
   const addNewNode = async () => {
     try {
@@ -155,7 +166,7 @@ const AddEditNotes = ({ noteData, type, getAllNotes, onClose, showNotificationMe
           </Select>
         </FormControl>
         <div className="manage-labels-link">
-          <Link to="/labels">Manage Labels</Link>
+          <button onClick={handleManageLabelsClick} className="link-button">Manage Labels</button>
         </div>
       </div>
 

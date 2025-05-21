@@ -123,8 +123,7 @@ exports.getAllNotes = async (req, res) => {
       .populate("tags", "name")
       .sort(sortOptions)
       .skip((page - 1) * limit)
-      .limit(parseInt(limit))
-      .lean();
+      .limit(parseInt(limit));
 
     return res.json({
       error: false,
@@ -208,7 +207,7 @@ exports.addLabel = async (req, res) => {
   };
 
   try {
-    const note = await Note.findOne({ _id: noteId, userId: user._id }).lean();
+    const note = await Note.findOne({ _id: noteId, userId: user._id })
 
     if (!note) {
       return res.status(404).json({ error: true, message: errors.noteNotFound });
@@ -235,7 +234,7 @@ exports.removeLabel = async (req, res) => {
   };
 
   try {
-    const note = await Note.findOne({ _id: noteId, userId: user._id }).lean();
+    const note = await Note.findOne({ _id: noteId, userId: user._id });
 
     if (!note) {
       return res.status(404).json({ error: true, message: errors.noteNotFound });
@@ -272,7 +271,7 @@ exports.shareNote = async (req, res) => {
   };
 
   try {
-    const note = await Note.findOne({ _id: noteId, userId: user._id }).lean();
+    const note = await Note.findOne({ _id: noteId, userId: user._id });
 
     if (!note) {
       return res.status(404).json({ error: true, message: errors.noteNotFound });

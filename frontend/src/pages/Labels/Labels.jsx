@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { TextField, Button, IconButton, List, ListItem, ListItemText } from "@mui/material";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { useLabels } from "../../hooks/useLabels";
@@ -10,6 +11,11 @@ const Labels = () => {
     const [editLabelId, setEditLabelId] = useState(null);
     const [editLabelName, setEditLabelName] = useState("");
     const [formError, setFormError] = useState("");
+    const location = useLocation();
+    const navigate = useNavigate();
+    const cameFromAddEdit = location.state?.from === "addEditNote";
+    const noteData = location.state?.noteData;
+    const type = location.state?.type;
 
     const handleCreate = async () => {
         if (!newLabel.trim()) {
@@ -45,6 +51,17 @@ const Labels = () => {
     return (
         <div className="labels-page">
             <h2 className="labels-title">Manage Labels</h2>
+            {cameFromAddEdit && (
+                <Button
+                    variant="outlined"
+                    onClick={() => navigate("/dashboard", {
+                        state: { openAddEditModal: true, noteData, type }
+                    })}
+                    style={{ marginBottom: "1rem" }}
+                >
+                    ← Back to Note
+                </Button>
+            )}
 
             <div className="label-input-row">
                 <TextField

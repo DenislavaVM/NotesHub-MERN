@@ -25,7 +25,7 @@
 .input-label {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--font-color);
 }
 
 .input-title,
@@ -44,8 +44,8 @@
 .input-title:focus,
 .textarea-content:focus,
 .input-tags:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  border-color: var(--input-focus-border);
+  box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.2);
 }
 
 .textarea-content {
@@ -56,7 +56,7 @@
 .add-btn {
   font-weight: 600;
   padding: 0.75rem;
-  background-color: #3b82f6;
+  background-color: var(--primary-color);
   color: white;
   border: none;
   border-radius: 8px;
@@ -69,12 +69,12 @@
 }
 
 .add-btn:hover {
-  background-color: #2563eb;
+  background-color: var(--primary-color);
   transform: translateY(-2px);
 }
 
 .add-btn:active {
-  background-color: #1d4ed8;
+  background-color: var(--primary-color);
   transform: translateY(0);
 }
 
@@ -94,16 +94,16 @@
 }
 
 .close-button:hover {
-  background-color: #f8fafc;
+  background-color: var(--light-gray);
 }
 
 .close-icon {
   font-size: 1.25rem;
-  color: #94a3b8;
+  color: var(--gray-color);
 }
 
 .error-message {
-  color: #ef4444;
+  color: var(--error-color);
   font-size: 0.75rem;
   padding-top: 1rem;
 }
@@ -122,6 +122,16 @@
 
 .manage-labels-link a:hover {
   color: var(--secondary-color);
+}
+
+.link-button {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: var(--primary-color);
+  cursor: pointer;
+  text-decoration: underline;
 }
 
 @media (max-width: 768px) {

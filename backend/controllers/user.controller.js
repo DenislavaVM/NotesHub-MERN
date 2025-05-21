@@ -4,7 +4,7 @@ const logger = require("../logger");
 exports.getUser = async (req, res, next) => {
   try {
     const user = req.user;
-    const isUser = await User.findOne({ _id: user._id }).lean();
+    const isUser = await User.findOne({ _id: user._id });
 
     if (!isUser) {
       return res.sendStatus(401);

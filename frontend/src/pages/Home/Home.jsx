@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { MdAdd } from "react-icons/md";
 import { Fab, Button, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
@@ -38,6 +39,7 @@ const Home = () => {
   const [tags, setTags] = useState([]);
   const [sortBy, setSortBy] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const location = useLocation();
   const navigate = useNavigate();
 
   const { notes, loading, fetchNotes, deleteNote, togglePinNote, pagination } = useNotes();
@@ -125,6 +127,17 @@ const Home = () => {
   useEffect(() => {
     fetchNotes({ searchQuery, tags, sortBy, page: currentPage });
   }, [searchQuery, tagKey, sortBy, currentPage]);
+
+  useEffect(() => {
+    if (location.state?.openAddEditModal) {
+      setOpenAddEditModal({
+        isShown: true,
+        data: location.state.noteData,
+        type: location.state.type
+      });
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   return (
     <>

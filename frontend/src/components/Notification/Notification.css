@@ -8,6 +8,44 @@
   z-index: 3000;
 }
 
+body.dark .notification-error {
+  background-color: #4e1e1e;
+  color: #ffb4b4;
+  border-left: 4px solid #ff6b6b;
+}
+
+body.dark .icon-error-color {
+  color: #ff6b6b;
+}
+
+body.dark .notification-success::before {
+  background-color: #34d399;
+}
+
+body.dark .notification-delete::before {
+  background-color: #f87171;
+}
+
+body.dark .notification-message {
+  color: #f1f1f1;
+}
+
+body.dark .notification-content {
+  border-color: #444;
+  background-color: #2e2e2e;
+  box-shadow: 0px 4px 16px rgba(255, 255, 255, 0.1);
+}
+
+body.dark .icon-delete {
+  background-color: #5a1a1a;
+  color: #f87171;
+}
+
+body.dark .icon-success {
+  background-color: #1e3a2f;
+  color: #34d399;
+}
+
 .notification-visible {
   opacity: 1;
   transform: translateY(0);

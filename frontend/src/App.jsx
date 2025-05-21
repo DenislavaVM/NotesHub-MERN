@@ -4,7 +4,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 import Home from "./pages/Home/Home";
 import Login from "./pages/Login/Login";
-import SignUp from "./pages/SingUp/SignUp";
+import SignUp from "./pages/SignUp/SignUp";
 import Labels from "./pages/Labels/Labels";
 import PrivateRoute from "./routes/PrivateRoute";
 import { ErrorProvider } from "./context/ErrorProvider";

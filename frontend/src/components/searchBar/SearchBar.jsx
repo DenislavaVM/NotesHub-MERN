@@ -20,25 +20,23 @@ const SearchBar = ({ value, onChange, handleSearch, onClearSearch, setSortBy, so
   }, [debounceTimeout, handleSearch]);
 
   useEffect(() => {
+    if (!value && !tagInput) {
+      return;
+    };
+
     const tagsArray = tagInput
       .split(",")
       .map(tag => tag.trim())
       .filter(tag => tag !== "");
 
-    debounceSearch(value, tagsArray);
+    const timeout = setTimeout(() => {
+      handleSearch(value, tagsArray);
+    }, 500);
 
-    return () => {
-      if (debounceTimeout) {
-        clearTimeout(debounceTimeout);
-      }
-    };
-  }, [value, tagInput, debounceSearch]);
+    return () => clearTimeout(timeout);
+  }, [value, tagInput]);
 
   const handleSearchClick = () => {
-    if (debounceTimeout) {
-      clearTimeout(debounceTimeout);
-    };
-
     const searchQuery = value;
     const tagsArray = tagInput
       .split(",")

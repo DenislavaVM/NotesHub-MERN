@@ -76,7 +76,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 0.5rem;
+  gap: 1.5rem;
   padding-left: 0.5rem;
 }
 

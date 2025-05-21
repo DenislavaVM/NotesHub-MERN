@@ -72,7 +72,10 @@ const Navbar = ({
           <SearchBar
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            handleSearch={handleSearch}
+            handleSearch={(query, tagsArray) => {
+              handleSearch(query, tagsArray);
+              setIsMobileMenuOpen(false);
+            }}
             onClearSearch={onClearSearch}
             setTags={setTags}
             setSortBy={setSortBy}

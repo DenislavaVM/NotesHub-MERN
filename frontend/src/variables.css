@@ -1,37 +1,43 @@
 :root {
-  --primary-color: #3b82f6;
-  --secondary-color: #2563eb;
-  --gray-color: #6b7280;
-  --light-gray: #e2e8f0;
-  --font-color: #1f2937;
+  --primary-color: #1e88e5;
+  --secondary-color: #43a047;
+  --gray-color: #9e9e9e;
+  --light-gray: #f5f5f5;
+  --font-color: #212121;
   --card-bg-color: #ffffff;
-  --note-tag-bg: #f3f4f6;
-  --note-content-color: #4b5563;
-  --note-date-color: #9ca3af;
-  --note-tag-text: #374151;
-  --box-shadow: 0 6px 16px rgba(0, 0, 0, 0.01);
-  --hover-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-
-  --input-border: 1px solid #ddd;
-  --input-focus-border: 1px solid var(--primary-color);
-  --error-color: #d9534f;
-  --background-color: #f9f9f9;
-  --button-padding: 0.75rem 1.5rem;
-  --text-color-light: #9ca3af;
-  --box-radius-small: 0.5rem;
+  --note-tag-bg: #e3f2fd;
+  --note-content-color: #424242;
+  --note-date-color: #757575;
+  --note-tag-text: #1e88e5;
+  --box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  --hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --input-border: #ccc;
+  --input-focus-border: #1e88e5;
+  --error-color: #e53935;
+  --background-color: #fafafa;
+  --button-padding: 0.5rem 1rem;
+  --text-color-light: #ffffff;
+  --box-radius-small: 6px;
 }
 
 body.dark {
-  --background-color: #2f3542;
-  --font-color: #f1f2f6;
-  --card-bg-color: #3b3f47;
-  --note-tag-bg: #505660;
-  --note-tag-text: #e0e6ed;
-  --note-content-color: #dcdde1;
-  --note-date-color: #a4b0be;
-  --input-border: 1px solid #596275;
-  --input-focus-border: 1px solid var(--primary-color);
-  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-  --hover-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
-  --text-color-light: #d2dae2;
+  --primary-color: #90caf9;
+  --secondary-color: #81c784;
+  --gray-color: #bdbdbd;
+  --light-gray: #424242;
+  --font-color: #e0e0e0;
+  --card-bg-color: #2c2c2c;
+  --note-tag-bg: #1e3a5f;
+  --note-content-color: #eeeeeec6;
+  --note-date-color: #9e9e9e;
+  --note-tag-text: #bbdefb;
+  --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  --hover-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+  --input-border: #555;
+  --input-focus-border: #90caf9;
+  --error-color: #ef5350;
+  --background-color: #121212c6;
+  --button-padding: 0.5rem 1rem;
+  --text-color-light: #e0e0e0;
+  --box-radius-small: 6px;
 }
