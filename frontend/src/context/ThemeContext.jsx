@@ -3,12 +3,20 @@ import { createContext, useContext, useEffect, useState } from "react";
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
-    const storedTheme = localStorage.getItem("theme");
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const [theme, setTheme] = useState(storedTheme || (prefersDark ? "dark" : "light"));
+    const getInitialTheme = () => {
+        const stored = localStorage.getItem("theme");
+        if (stored === "dark" || stored === "light") {
+            return stored;
+        };
+
+        return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    };
+
+    const [theme, setTheme] = useState(getInitialTheme);
 
     useEffect(() => {
-        document.body.classList.toggle("dark", theme === "dark");
+        document.body.classList.remove("dark", "light");
+        document.body.classList.add(theme);
         localStorage.setItem("theme", theme);
     }, [theme]);
 
