@@ -1,5 +1,5 @@
 const Note = require("../models/note.model");
-const { findUserNote, findAndUpdateNote } = require("../helpers/noteHelpers");
+const { findUserNote, findAndUpdateNote, getNoteByIdWithUser } = require("../helpers/noteHelpers");
 const logger = require("../logger");
 const { errors, success } = require("../config/messages");
 
@@ -21,9 +21,7 @@ exports.addNote = async (req, res, next) => {
     });
 
     await note.save();
-    const populatedNote = await Note.findById(note._id)
-      .populate("userId", "firstName lastName email")
-      .populate("tags", "name");
+    const populatedNote = await getNoteByIdWithUser(note._id);
 
     logger.info(`Note added by user: ${user.email}`);
     return res.json({ error: false, note: populatedNote, message: success.noteAdded });
@@ -70,10 +68,7 @@ exports.editNote = async (req, res) => {
     };
 
     await note.save();
-    const populatedNote = await Note.findById(note._id)
-      .populate("userId", "firstName lastName email")
-      .populate("tags", "name");
-
+    const populatedNote = await getNoteByIdWithUser(note._id);
     return res.json({ error: false, note: populatedNote, message: success.noteUpdated });
   } catch (error) {
     return res.status(500).json({ error: true, message: errors.internal });
@@ -278,10 +273,7 @@ exports.shareNote = async (req, res) => {
     const newEmails = emails.filter(email => !note.sharedWith.includes(email));
     note.sharedWith.push(...newEmails);
     await note.save();
-    const populatedNote = await Note.findById(note._id)
-      .populate("userId", "firstName lastName email")
-      .populate("tags", "name");
-
+    const populatedNote = await getNoteByIdWithUser(note._id);
     return res.json({ error: false, note: populatedNote, message: success.noteShared });
   } catch (error) {
     return res.status(500).json({ error: true, message: errors.internal });

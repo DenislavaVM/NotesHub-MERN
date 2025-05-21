@@ -14,3 +14,9 @@ exports.findAndUpdateNote = async (noteId, userId, updateData) => {
     await note.save();
     return note;
 };
+
+exports.getNoteByIdWithUser = async (noteId) => {
+    return await Note.findById(noteId)
+        .populate("userId", "firstName lastName email")
+        .populate("tags", "name");
+};
