@@ -9,8 +9,8 @@
 
 .login-form {
   width: 100%;
-  max-width: 50rem;
-  border: 1px solid #ddd;
+  max-width: 30rem;
+  border: 5px solid #ddd;
   border-radius: var(--border-radius);
   background-color: var(--card-bg-color);
   padding: 2rem;

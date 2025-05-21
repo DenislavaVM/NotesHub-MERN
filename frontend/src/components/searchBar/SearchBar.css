@@ -3,7 +3,7 @@
 .search-bar-container {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   gap: 1rem;
   padding: 1rem 1.5rem;
   border-radius: 16px;
@@ -26,5 +26,19 @@
 
   .search-bar-buttons {
     justify-content: center;
+  }
+}
+
+@media (max-width: 600px) {
+  .search-bar-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.5rem;
+  }
+
+  .search-bar-buttons {
+    flex-direction: column;
+    gap: 0.5rem;
   }
 }

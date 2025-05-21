@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useSwipeable } from "react-swipeable";
 import {
     MdOutlinePushPin,
     MdCreate,
@@ -24,9 +25,16 @@ const NoteCard = ({
     const [showShareModal, setShowShareModal] = useState(false);
     const formattedTags = typeof tags === "string" ? tags.split(",") : tags;
 
+    const swipeHandlers = useSwipeable({
+        onSwipedLeft: () => onDelete?.(),
+        onSwipedRight: () => onEdit?.(),
+        preventDefaultTouchmoveEvent: true,
+        trackTouch: true,
+    });
+
     return (
         <>
-            <div className="note-card">
+            <div {...swipeHandlers} className="note-card">
                 <div className="note-card-header">
                     <div>
                         <h6 className="note-title">{title}</h6>

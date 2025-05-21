@@ -67,6 +67,13 @@
 }
 
 @media (max-width: 480px) {
+  .MuiFab-root {
+    bottom: 16px !important;
+    right: 16px !important;
+    width: 56px;
+    height: 56px;
+  }
+
   .note-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
@@ -74,5 +81,13 @@
 
   .home-container {
     padding: 0 0.5rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .MuiFab-root {
+    bottom: 16px !important;
+    right: 16px !important;
+    z-index: 1050;
   }
 }
