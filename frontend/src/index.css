@@ -1,11 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
 @import "./variables.css";
 
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
+  overflow: hidden;
+}
+
+body {
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -70,8 +74,39 @@ body {
   flex-direction: column;
 }
 
-.mt-1 { margin-top: 1rem; }
-.mt-2 { margin-top: 2rem; }
-.mb-1 { margin-bottom: 1rem; }
-.mb-2 { margin-bottom: 2rem; }
-.mx-auto { margin-left: auto; margin-right: auto; }
+.mt-1 {
+  margin-top: 1rem;
+}
+
+.mt-2 {
+  margin-top: 2rem;
+}
+
+.mb-1 {
+  margin-bottom: 1rem;
+}
+
+.mb-2 {
+  margin-bottom: 2rem;
+}
+
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 90%;
+  }
+
+  .login-form {
+    max-width: 95%;
+    padding: 1rem;
+  }
+
+  .input-box,
+  .btn-primary {
+    font-size: 0.95rem;
+  }
+}

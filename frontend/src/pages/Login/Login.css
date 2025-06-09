@@ -1,10 +1,11 @@
 .login-container {
+  flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 80vh;
-  padding: 1px;
+  padding: 0;
   background-color: var(--background-color);
+  flex-direction: column;
 }
 
 .login-form {
@@ -86,4 +87,29 @@
 .input-error {
   border-color: var(--error-color);
   box-shadow: 0 0 0 3px rgba(217, 83, 79, 0.25);
+}
+
+@media (max-width: 480px) {
+  .login-form {
+    padding: 1.5rem 1rem;
+    border-width: 2px;
+    max-width: 90%;
+  }
+
+  .login-title {
+    font-size: 1.5rem;
+  }
+
+  .btn-primary {
+    font-size: 0.95rem;
+  }
+
+  .register-prompt {
+    font-size: 0.9rem;
+  }
+
+  .signup-link {
+    display: inline-block;
+    margin-top: 0.5rem;
+  }
 }
