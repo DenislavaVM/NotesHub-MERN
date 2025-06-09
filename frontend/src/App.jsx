@@ -12,9 +12,10 @@ import { ThemeProvider } from "./context/ThemeContext";
 
 const App = () => {
   return (
-    <ThemeProvider>
-      <ErrorProvider>
-        <Router>
+
+    <Router>
+      <ThemeProvider>
+        <ErrorProvider>
           <Routes>
             <Route path="/dashboard" element={<PrivateRoute><Home /></PrivateRoute>} />
             <Route path="/labels" element={<PrivateRoute><Labels /></PrivateRoute>} />
@@ -24,9 +25,9 @@ const App = () => {
           </Routes>
 
           <ToastContainer position="top-center" autoClose={3000} />
-        </Router>
-      </ErrorProvider>
-    </ThemeProvider>
+        </ErrorProvider>
+      </ThemeProvider>
+    </Router>
   );
 };
 

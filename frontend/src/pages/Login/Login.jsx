@@ -4,7 +4,6 @@ import Navbar from "../../components/Navbar/Navbar";
 import { Link, useNavigate } from "react-router-dom";
 import "./Login.css";
 import PasswordInput from "../../components/input/PasswordInput";
-import { validateEmail } from "../../utils/helper";
 import apiClient from "../../utils/apiClient.js";
 import { useAuth } from "../../hooks/useAuth.js";
 
@@ -26,7 +25,9 @@ const Login = () => {
           headers: { Authorization: `Bearer ${response.data.accessToken}` }
         });
         setUser(userRes.data.user);
-        navigate("/dashboard");
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 100);
       };
     } catch (error) {
       if (error.response?.data?.message) {
