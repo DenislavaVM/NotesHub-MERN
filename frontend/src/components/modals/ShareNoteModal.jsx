@@ -30,7 +30,7 @@ const ShareNoteModal = ({ isOpen, onClose, noteId, onShareSuccess }) => {
         setIsSubmitting(true);
 
         try {
-            const response = await apiClient.put(`/share-note/${noteId}`, {
+            const response = await apiClient.put(`/notes/share-note/${noteId}`, {
                 emails: emailList,
             });
             if (response.data && !response.data.error) {
@@ -39,20 +39,15 @@ const ShareNoteModal = ({ isOpen, onClose, noteId, onShareSuccess }) => {
                 onShareSuccess?.();
             };
         } catch (err) {
-            toast.error(err.response?.data?.message || "Failed to share note");
+            const message = err.response?.data?.error?.message || "Failed to share note";
+            toast.error(message);
         } finally {
             setIsSubmitting(false);
         };
     };
 
-    const handleClose = () => {
-        setEmails("");
-        toast.info("Sharing cancelled");
-        onClose();
-    };
-
     return (
-        <Modal isOpen={isOpen} onRequestClose={handleClose} className="share-modal" overlayClassName="overlay">
+        <Modal isOpen={isOpen} onRequestClose={onClose} className="share-modal" overlayClassName="overlay">
             <h3>Share Note</h3>
             <p>Enter email addresses (comma-separated):</p>
             <input
