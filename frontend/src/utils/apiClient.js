@@ -4,7 +4,7 @@ const createApiClient = () => {
     let accessToken = null;
 
     const apiClient = axios.create({
-        baseURL: "/api",
+        baseURL: import.meta.env.VITE_API_URL,
         withCredentials: true,
         headers: {
             "Content-Type": "application/json",
