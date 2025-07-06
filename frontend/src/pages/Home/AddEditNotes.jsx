@@ -1,189 +1,236 @@
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useCallback, useEffect } from "react";
+import { useForm, Controller } from "react-hook-form";
 import { MdClose } from "react-icons/md";
-import { FormControl, InputLabel, Select, MenuItem, Checkbox, ListItemText } from "@mui/material";
-import apiClient from "../../utils/apiClient";
+import { FormControl, Select, MenuItem, Checkbox, ListItemText, OutlinedInput } from "@mui/material";
+import { useLabels } from "../../hooks/useLabels";
+import { useNotesContext } from "../../context/NotesContext";
+import { useSocket } from "../../context/SocketContext";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 import "./AddEditNotes.css";
 
-const AddEditNotes = ({ noteData, type, getAllNotes, onClose, showNotificationMessage }) => {
-  const [title, setTitle] = useState(noteData?.title || "");
-  const [content, setContent] = useState(noteData?.content || "");
-  const [tags, setTags] = useState(
-    noteData?.tags?.map((tag) => (typeof tag === "string" ? tag : tag._id)) || []
+const EMPTY_CONTENT = {
+  type: "doc",
+  content: [{ type: "paragraph" }],
+};
+
+const debounce = (fn, delay) => {
+  let timeout;
+  return (...args) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => fn(...args), delay);
+  };
+};
+
+const AddEditNotes = ({ type, noteData, onClose }) => {
+  const { addNote, editNote } = useNotesContext();
+  const { labels: availableLabels } = useLabels();
+  const socket = useSocket();
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    setValue,
+    setError,
+    watch,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      title: noteData?.title || "",
+      content: noteData?.content || "",
+      labels: noteData?.labels?.map(l => l.name) || [],
+      color: noteData?.color || "#ffffff",
+    },
+  });
+
+  const debouncedEmit = useCallback(
+    debounce((field, value) => {
+      if (socket && noteData?._id) {
+        socket.emit("note:update", {
+          noteId: noteData._id,
+          field,
+          value,
+        });
+      }
+    }, 500),
+    [socket, noteData]
   );
-  const [reminder, setReminder] = useState(noteData?.reminder || "");
-  const [error, setError] = useState(null);
-  const [availableLabels, setAvailableLabels] = useState([]);
-  const navigate = useNavigate();
 
-  const handleManageLabelsClick = () => {
-    navigate("/labels", {
-      state: {
-        from: "addEditNote",
-        noteData,
-        type: type || "add"
-      }
-    });
-  };
+  const editor = useEditor({
+    extensions: [StarterKit],
+    content: noteData?.content || EMPTY_CONTENT,
+    onUpdate: ({ editor }) => {
+      const jsonContent = editor.getJSON();
+      setValue("content", jsonContent, { shouldDirty: true });
+      debouncedEmit("content", jsonContent);
+    },
+  });
 
-  const addNewNode = async () => {
-    try {
-      const response = await apiClient.post("/add-note", {
-        title,
-        content,
-        tags,
-        reminder,
-      });
-
-      if (response.data && response.data.note) {
-        showNotificationMessage("Note added successfully");
-        getAllNotes();
-        onClose();
-      }
-    } catch (error) {
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message
-      ) {
-        setError(error.response.data.message);
-      }
-    }
-  };
-
-  const editNote = async () => {
-    const noteId = noteData._id;
-
-    try {
-      const response = await apiClient.put("/edit-note/" + noteId, {
-        title,
-        content,
-        tags,
-        reminder,
-      });
-
-      if (response.data && response.data.note) {
-        showNotificationMessage("Note updated successfully");
-        getAllNotes();
-        onClose();
-      }
-    } catch (error) {
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message
-      ) {
-        setError(error.response.data.message);
-      }
-    }
-  };
-
-  const handleAddNote = () => {
-    if (!title) {
-      setError("Please enter the title");
-      return;
-    }
-
-    if (!content) {
-      setError("Please enter the content");
-      return;
-    }
-
-    setError("");
-
-    if (type === "edit") {
-      editNote();
-    } else {
-      addNewNode();
-    }
-  };
+  const selectedColor = watch("color");
 
   useEffect(() => {
-    const fetchLabels = async () => {
-      try {
-        const response = await apiClient.get("/labels");
-        if (response.data?.labels) {
-          setAvailableLabels(response.data.labels);
-        }
-      } catch (error) {
-        console.error("Error loading labels", error);
-      }
-    };
-    fetchLabels();
-  }, []);
+    if (noteData) {
+      setValue("title", noteData.title || "");
+      setValue("labels", noteData.labels?.map((label) => label.name) || []);
+      setValue("color", noteData.color || "#ffffff");
+      const newContent = noteData.content || EMPTY_CONTENT;
+      setValue("content", newContent);
 
+      if (editor && JSON.stringify(editor.getJSON()) !== JSON.stringify(newContent)) {
+        editor.commands.setContent(newContent, false);
+      };
+    };
+  }, [noteData, setValue, editor]);
+
+  useEffect(() => {
+    if (type === "edit" && socket && noteData?._id) {
+      socket.emit("note:join", noteData._id);
+      const handleNoteUpdate = (data) => {
+        const isTitleFocused = document.activeElement?.id === "note-title";
+        const isEditorFocused = editor?.isFocused;
+
+        if (data.field === "content" && editor && !isEditorFocused) {
+          if (JSON.stringify(editor.getJSON()) !== JSON.stringify(data.value)) {
+            editor.commands.setContent(data.value, false);
+            setValue("content", data.value, { shouldDirty: true });
+          };
+        };
+
+        if (data.field === "title" && !isTitleFocused) {
+          setValue("title", data.value, { shouldDirty: true });
+        };
+      };
+      socket.on("note:updated", handleNoteUpdate);
+
+      return () => {
+        socket.emit("note:leave", noteData._id);
+        socket.off("note:updated", handleNoteUpdate);
+      };
+    }
+  }, [socket, noteData, type, setValue, editor]);
+
+
+  const onSubmit = async (data) => {
+    try {
+      if (type === "edit") {
+        await editNote(noteData._id, data);
+      } else {
+        await addNote(data);
+      }
+      onClose();
+    } catch (err) {
+      const message = err.response?.data?.error?.message || `Failed to ${type} note.`;
+      setError("serverError", { type: "manual", message });
+    }
+  };
 
   return (
-    <div className="add-edit-notes-container">
-      <button className="close-button" onClick={onClose}>
-        <MdClose className="close-icon" />
+    <div className="add-edit-notes-content" style={{ backgroundColor: selectedColor }}>
+      <button className="close-btn icon-btn" onClick={onClose}>
+        <MdClose />
       </button>
+      <form onSubmit={handleSubmit(onSubmit)} className="add-edit-form">
 
-      <div className="input-group">
-        <label className="input-label">Title</label>
-        <input
-          type="text"
-          className="input-title"
-          placeholder="Enter note title..."
-          value={title}
-          onChange={({ target }) => setTitle(target.value)}
-        />
-      </div>
-
-      <div className="input-group">
-        <label className="input-label">Content</label>
-        <textarea
-          className="textarea-content"
-          placeholder="Write your content here..."
-          rows={10}
-          value={content}
-          onChange={({ target }) => setContent(target.value)}
-        />
-      </div>
-
-      <div className="input-group">
-        <FormControl fullWidth>
-          <InputLabel>Labels</InputLabel>
-          <Select
-            multiple
-            value={tags}
-            onChange={(e) => setTags(e.target.value)}
-            renderValue={(selected) =>
-              selected
-                .map((id) => {
-                  const label = availableLabels.find((label) => label._id === id);
-                  return label ? label.name : "";
-                })
-                .join(", ")
-            }
-          >
-            {availableLabels.map((label) => (
-              <MenuItem key={label._id} value={label._id}>
-                <Checkbox checked={tags.includes(label._id)} />
-                <ListItemText primary={label.name} />
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <div className="manage-labels-link">
-          <button onClick={handleManageLabelsClick} className="link-button">Manage Labels</button>
+        <div className="note-editor-header">
+          <div className="input-group">
+            <label className="input-label">TITLE</label>
+            <Controller
+              name="title"
+              control={control}
+              rules={{ required: "Please enter a title." }}
+              render={({ field }) => (
+                <input
+                  id="note-title"
+                  type="text"
+                  className="input-field title-input"
+                  placeholder="My Awesome Note"
+                  {...field}
+                  onChange={(e) => {
+                    field.onChange(e.target.value);
+                    debouncedEmit("title", e.target.value);
+                  }}
+                />
+              )}
+            />
+            {errors.title && <p className="error-message">{errors.title.message}</p>}
+          </div>
         </div>
-      </div>
 
-      <div className="input-group">
-        <label className="input-label">Set Reminder</label>
-        <input
-          type="datetime-local"
-          value={reminder}
-          onChange={({ target }) => setReminder(target.value)}
-        />
-      </div>
+        <div className="note-editor-body">
+          <div className="input-group content-group">
+            <label className="input-label">CONTENT</label>
+            <div className="tiptap-editor-wrapper">
+              <EditorContent editor={editor} />
+            </div>
+          </div>
 
-      {error && <p className="error-message">{error}</p>}
+          <div className="input-group">
+            <label className="input-label">COLOR</label>
+            <Controller
+              name="color"
+              control={control}
+              render={({ field }) => (
+                <div className="color-palette">
+                  {["#ffffff", "#fecaca", "#fef08a", "#bbf7d0", "#bfdbfe", "#fbcfe8"].map(
+                    (color) => (
+                      <div
+                        key={color}
+                        className={`color-swatch ${field.value === color ? "selected" : ""}`}
+                        style={{ backgroundColor: color }}
+                        onClick={() => {
+                          field.onChange(color);
+                          debouncedEmit("color", color);
+                        }}
+                        aria-label={`Select color ${color}`}
+                      />
+                    )
+                  )}
+                </div>
+              )}
+            />
+          </div>
 
-      <button className="btn-primary add-btn" onClick={handleAddNote}>
-        {type === "edit" ? "Update Note" : "Add Note"}
-      </button>
+          <div className="input-group">
+            <label className="input-label">LABELS</label>
+            <Controller
+              name="labels"
+              control={control}
+              render={({ field }) => (
+                <FormControl fullWidth size="small">
+                  <Select
+                    labelId="labels-select-label"
+                    multiple
+                    {...field}
+                    onChange={(e) => {
+                      field.onChange(e.target.value);
+                      debouncedEmit("labels", e.target.value);
+                    }}
+                    renderValue={(selected) => selected.join(", ") || "Select labels"}
+                    input={<OutlinedInput />}
+                    displayEmpty
+                  >
+                    {availableLabels.map((label) => (
+                      <MenuItem key={label._id} value={label.name}>
+                        <Checkbox checked={field.value.includes(label.name)} size="small" />
+                        <ListItemText primary={label.name} />
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              )}
+            />
+          </div>
+        </div>
+
+        {errors.serverError && (
+          <p className="error-message">{errors.serverError.message}</p>
+        )}
+
+        <button type="submit" className="btn-primary">
+          {type === "edit" ? "UPDATE" : "ADD"}
+        </button>
+      </form>
     </div>
   );
 };

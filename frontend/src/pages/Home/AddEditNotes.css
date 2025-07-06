@@ -1,19 +1,79 @@
-.add-edit-notes-container {
+.add-edit-notes-content {
   display: flex;
   flex-direction: column;
-  padding: 1rem;
+  padding: 0;
   background-color: var(--card-bg-color);
   color: var(--font-color);
-  border-radius: 20px;
-  box-shadow: var(--box-shadow);
-  width: 100%;
-  max-width: 600px;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  position: relative;
+  overflow: hidden;
+}
+
+.add-edit-form {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.note-editor-header {
+  padding: 1.5rem 2rem 0.5rem 2rem;
+  transition: background-color 0.3s ease;
+  border-bottom: 1px solid var(--input-border);
+}
+
+.note-editor-header .input-field {
+  color: black;
+  font-size: 1.75rem;
+  font-weight: 700;
+  border: none;
+  background: transparent;
+  outline: none;
+  padding: 0;
+}
+
+.note-editor-header .input-field::placeholder {
+  color: var(--gray-color);
+  opacity: 1;
+}
+
+body.dark .note-editor-header .input-field::placeholder {
+  color: var(--gray-color);
+  opacity: 1;
+}
+
+body.dark .note-editor-header .input-field {
+  color: var(--font-color);
+}
+
+body.dark .input-group .MuiInputBase-root {
+  background-color: var(--background-color) !important;
+  color: var(--font-color) !important;
+}
+
+body.dark .MuiMenuItem-root {
+  color: var(--font-color);
+  background-color: var(--card-bg-color);
+}
+
+body.dark .MuiCheckbox-root svg {
+  color: var(--primary-color);
+}
+
+body.dark .MuiListItemText-primary {
+  color: var(--font-color);
+}
+
+body.dark .MuiSelect-root.MuiSelect-displayEmpty {
+  color: var(--gray-color);
+}
+
+.note-editor-body {
+  padding: 1.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
   overflow-y: auto;
-  z-index: 2000;
+  flex-grow: 1;
 }
 
 .input-group {
@@ -23,145 +83,114 @@
 }
 
 .input-label {
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   font-weight: 600;
-  color: var(--font-color);
+  color: var(--gray-color);
+  text-transform: uppercase;
 }
 
-.input-title,
-.textarea-content,
-.input-tags {
+.content-textarea {
+  width: 100%;
+  resize: vertical;
+  line-height: 1.6;
   font-size: 1rem;
-  outline: none;
-  background-color: var(--card-bg-color);
+  font-family: inherit;
+  min-height: 200px;
+
+  background-color: var(--background-color);
   color: var(--font-color);
-  border: var(--input-border);
+  border: 1px solid var(--input-border);
+
+  border-radius: var(--border-radius);
   padding: 0.75rem;
-  border-radius: 6px;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.input-title:focus,
-.textarea-content:focus,
-.input-tags:focus {
-  border-color: var(--input-focus-border);
-  box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.2);
+.content-textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(30, 136, 229, 0.2);
 }
 
-.textarea-content {
-  resize: none;
-  height: 150px;
+
+.content-group .tiptap-editor-wrapper {
+  border: 1px solid var(--input-border);
+  border-radius: var(--border-radius);
+  padding: 0.5rem;
+  flex-grow: 1;
+  background-color: var(--background-color);
 }
 
-.add-btn {
-  font-weight: 600;
-  padding: 0.75rem;
+.close-btn {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  color: var(--font-color);
+  z-index: 10;
+  opacity: 0.7;
+}
+
+.btn-primary {
+  padding: 0.8rem;
+  border: none;
+  border-radius: var(--box-radius-small);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
   background-color: var(--primary-color);
   color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  margin-top: 1rem;
+  margin: 0 2rem 1.5rem 2rem;
+  width: auto;
+}
+
+.add-edit-notes-content .btn-primary {
+  width: auto;
   align-self: center;
-  width: 100%;
-  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+  font-weight: 600;
+  padding: 0.8rem 2.5rem;
+  border-radius: 50px;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 15px -5px var(--primary-color);
+  transition: all 0.2s ease-in-out;
 }
 
-.add-btn:hover {
-  background-color: var(--primary-color);
+.add-edit-notes-content .btn-primary:hover {
   transform: translateY(-2px);
+  box-shadow: 0 6px 20px -5px var(--primary-color);
 }
 
-.add-btn:active {
-  background-color: var(--primary-color);
-  transform: translateY(0);
-}
-
-.close-button {
-  width: 2.5rem;
-  height: 2.5rem;
+.color-palette {
   display: flex;
+  gap: 0.75rem;
   align-items: center;
-  justify-content: center;
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
+}
+
+.color-swatch {
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  background-color: transparent;
   cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.close-button:hover {
-  background-color: var(--light-gray);
-}
-
-.close-icon {
-  font-size: 1.25rem;
-  color: var(--gray-color);
-}
-
-.error-message {
-  color: var(--error-color);
-  font-size: 0.75rem;
-  padding-top: 1rem;
-}
-
-.manage-labels-link {
-  text-align: right;
-  margin-top: 0.25rem;
-}
-
-.manage-labels-link a {
-  font-size: 0.85rem;
-  color: var(--primary-color);
-  text-decoration: underline;
-  transition: color 0.2s ease;
-}
-
-.manage-labels-link a:hover {
-  color: var(--secondary-color);
-}
-
-.link-button {
+  border: 2px solid var(--input-border);
+  transition: all 0.2s ease;
   background: none;
-  border: none;
   padding: 0;
-  font: inherit;
-  color: var(--primary-color);
-  cursor: pointer;
-  text-decoration: underline;
+  border: 2px solid var(--input-border);
 }
 
-@media (max-width: 768px) {
-  .add-edit-notes-container {
-    width: 90%;
-    max-width: 400px;
-  }
-
-  .input-group {
-    gap: 0.25rem;
-  }
+.color-swatch:focus {
+  outline: none;
 }
 
-@media (max-width: 480px) {
-  .add-edit-notes-container {
-    width: 95%;
-    max-height: 90vh;
-    padding: 1rem 0.5rem;
-    border-radius: 12px;
-    overflow-y: auto;
-  }
+.color-swatch.selected {
+  border-color: var(--primary-color);
+  transform: scale(1.15);
+  box-shadow: 0 0 8px -1px var(--primary-color);
+}
 
-  .input-title,
-  .textarea-content {
-    font-size: 0.9rem;
-    padding: 0.5rem;
-  }
+.input-group .MuiInputBase-root {
+  background-color: var(--background-color) !important;
+}
 
-  .add-btn {
-    font-size: 1rem;
-    padding: 0.75rem;
-  }
+.input-group .MuiOutlinedInput-notchedOutline {
+  border-color: var(--input-border) !important;
 }
