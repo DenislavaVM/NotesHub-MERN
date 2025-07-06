@@ -16,7 +16,7 @@ const SignUp = () => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await apiClient.post("/create-account", data);
+      const response = await apiClient.post("/auth/create-account", data);
       if (response.data && response.data.accessToken) {
         login(response.data.user, response.data.accessToken);
       }
