@@ -1,44 +1,50 @@
 @import "../../variables.css";
 
-.search-bar-container {
+.search-bar-trigger {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  padding: 1rem 1.5rem;
-  border-radius: 16px;
-  box-shadow: var(--box-shadow);
-  max-width: 100%;
-  background-color: var(--card-bg-color);
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--box-radius-small);
+  width: 100%;
+  max-width: 220px;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
-.search-bar-buttons {
+.search-bar-trigger:hover {
+  background-color: var(--background-color);
+}
+
+.search-icon {
+  font-size: 1.2rem;
+  color: var(--gray-color);
+}
+
+.search-placeholder {
+  color: var(--gray-color);
+  font-size: 0.9rem;
+}
+
+.search-bar-active {
   display: flex;
+  align-items: center;
   gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--box-radius-small);
+  background-color: var(--note-tag-bg);
+  color: var(--note-tag-text);
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
-@media (max-width: 768px) {
-  .search-bar-container {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.5rem;
-  }
-
-  .search-bar-buttons {
-    justify-content: center;
-  }
+.clear-search-btn {
+  color: var(--note-tag-text);
+  padding: 0.1rem;
 }
 
-@media (max-width: 600px) {
-  .search-bar-container {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    padding: 0.5rem;
-  }
-
-  .search-bar-buttons {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
+.clear-search-btn:hover {
+  background-color: rgba(0, 0, 0, 0.1);
 }
