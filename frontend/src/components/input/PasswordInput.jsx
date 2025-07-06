@@ -17,9 +17,9 @@ const PasswordInput = React.forwardRef(({ name, onChange, onBlur, placeholder },
         onChange={onChange}
         onBlur={onBlur}
         type={isShowPassword ? "text" : "password"}
-        placeholder={placeholder || "Password"}
+        placeholder={placeholder}
         className="password-input-field"
-        aria-label={placeholder || "Password"}
+        aria-label={placeholder}
       />
       <button
         type="button"
