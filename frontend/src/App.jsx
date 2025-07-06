@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -7,27 +7,22 @@ import Login from "./pages/Login/Login";
 import SignUp from "./pages/SignUp/SignUp";
 import Labels from "./pages/Labels/Labels";
 import PrivateRoute from "./routes/PrivateRoute";
-import { ErrorProvider } from "./context/ErrorProvider";
-import { ThemeProvider } from "./context/ThemeContext";
+import Layout from "./routes/Layout";
 
 const App = () => {
   return (
-
-    <Router>
-      <ThemeProvider>
-        <ErrorProvider>
-          <Routes>
-            <Route path="/dashboard" element={<PrivateRoute><Home /></PrivateRoute>} />
-            <Route path="/labels" element={<PrivateRoute><Labels /></PrivateRoute>} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/" element={<Navigate to="/login" />} />
-          </Routes>
-
-          <ToastContainer position="top-center" autoClose={3000} />
-        </ErrorProvider>
-      </ThemeProvider>
-    </Router>
+    <>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignUp />} />
+        <Route element={<PrivateRoute><Layout /></PrivateRoute>}>
+          <Route path="/dashboard" element={<Home />} />
+          <Route path="/labels" element={<Labels />} />
+        </Route>
+        <Route path="/" element={<Navigate to="/dashboard" />} />
+      </Routes>
+      <ToastContainer position="top-center" autoClose={3000} />
+    </>
   );
 };
 
