@@ -1,14 +1,16 @@
 const express = require("express");
 const router = express.Router();
 
-const authRoutes = require("./auth.routes");
-const userRoutes = require("./user.routes");
-const noteRoutes = require("./note.routes");
-const labelRoutes = require("./label.routes");
+const authRoutes = require("./auth.routes.js");
+const userRoutes = require("./user.routes.js");
+const noteRoutes = require("./note.routes.js");
+const labelRoutes = require("./label.routes.js");
+const notificationRoutes = require("./notification.routes.js");
 
-router.use("/", authRoutes);
-router.use("/", userRoutes);
-router.use("/", noteRoutes);
-router.use("/", labelRoutes);
+router.use("/auth", authRoutes);
+router.use("/users", userRoutes);
+router.use("/notes", noteRoutes);
+router.use("/labels", labelRoutes);
+router.use("/notifications", notificationRoutes);
 
 module.exports = router;
