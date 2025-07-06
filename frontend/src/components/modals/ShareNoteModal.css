@@ -8,12 +8,14 @@
     margin: auto;
     position: relative;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    outline: none;
 }
 
 .share-modal h3 {
     margin-top: 0;
     margin-bottom: 0.5rem;
     font-size: 1.25rem;
+    font-weight: 600;
 }
 
 .overlay {
@@ -22,59 +24,43 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.6);
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 2000;
 }
 
 .email-input {
-    background-color: var(--card-bg-color);
+    background-color: var(--background-color);
     color: var(--font-color);
     width: 100%;
     padding: 0.75rem;
     border: 1px solid var(--input-border);
     border-radius: 8px;
-    margin-top: 0.5rem;
-    margin-bottom: 0.75rem;
+    margin-top: 1rem;
+    margin-bottom: 1.5rem;
     font-size: 1rem;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.error {
-    color: red;
-    font-size: 0.9rem;
-    margin-bottom: 0.5rem;
-}
-
-.success {
-    color: green;
-    font-size: 0.9rem;
-    margin-bottom: 0.5rem;
+.email-input:focus {
+    outline: none;
+    border-color: var(--input-focus-border);
+    box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.2);
 }
 
 .modal-actions {
     display: flex;
-    gap: 1rem;
-    justify-content: flex-end;
+    gap: 0.75rem;
+    justify-content: center;
 }
 
-.btn-secondary {
-    background-color: #e5e7eb;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.btn-secondary:hover {
-    background-color: #d1d5db;
-}
-
-.btn-primary:disabled {
-    background-color: #93c5fd;
-    cursor: not-allowed;
+.modal-actions .btn-primary,
+.modal-actions .btn-secondary {
+    width: auto;
+    margin-top: 0;
 }
 
 @media (max-width: 600px) {
