@@ -2,12 +2,12 @@ import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { MdDarkMode, MdLightMode, MdMenu } from "react-icons/md";
 import ProfileInfo from "../Cards/ProfileInfo";
-import SearchBar from "../searchBar/SearchBar";
 import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../hooks/useAuth";
 import NotificationBell from "./NotificationBell";
 import Sidebar from "../Sidebar/Sidebar";
 import "./Navbar.css";
+import SearchBar from "../searchBar/SearchBar";
 
 const Navbar = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
