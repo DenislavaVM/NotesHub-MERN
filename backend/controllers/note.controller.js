@@ -1,25 +1,40 @@
 const Note = require("../models/note.model");
-const { findUserNote, findAndUpdateNote, getNoteByIdWithUser } = require("../helpers/noteHelpers");
 const Label = require("../models/label.model");
+const User = require("../models/user.model");
 const logger = require("../logger");
+const { createNotification } = require("./notification.controller");
+const { getNoteByIdWithUser } = require("../helpers/noteHelpers");
 const { errors, success } = require("../config/messages");
+const {
+  ValidationError,
+  NotFoundError
+} = require("../errors");
 
 exports.addNote = async (req, res, next) => {
-  const { title, content, tags = [], isPinned } = req.body;
+  const { title, content, labels = [], isPinned, color } = req.body;
   const user = req.user;
 
-  if (!title || !content) {
-    return res.status(400).json({ error: true, message: errors.titleContentRequired });
-  };
-
   try {
-    const labelDocs = await Label.find({ name: { $in: tags }, userId: user._id });
-    const tagIds = labelDocs.map(label => label._id);
+    let labelIds = [];
+    if (labels.length > 0) {
+      const foundLabels = await Label.find({
+        name: { $in: labels },
+        userId: user._id
+      });
+
+      if (foundLabels.length !== labels.length) {
+        throw new ValidationError("One or more labels are invalid.");
+      };
+
+      labelIds = foundLabels.map(label => label._id);
+    };
+
     const note = new Note({
       title,
       content,
-      tags: tags,
+      labels: labelIds,
       isPinned: isPinned || false,
+      color,
       userId: user._id,
     });
 
@@ -27,262 +42,358 @@ exports.addNote = async (req, res, next) => {
     const populatedNote = await getNoteByIdWithUser(note._id);
 
     logger.info(`Note added by user: ${user.email}`);
-    return res.json({ error: false, note: populatedNote, message: success.noteAdded });
+    res.status(201).json({
+      success: true,
+      data: populatedNote,
+      message: "Note added successfully"
+    });
   } catch (error) {
     logger.error(`Error adding note: ${error.message}`);
     next(error);
-  }
+  };
 };
 
-exports.editNote = async (req, res) => {
-  const noteId = req.params.noteId;
-  const { title, content, tags, reminder, isPinned } = req.body;
-  const user = req.user;
+exports.editNote = async (req, res, next) => {
+    const noteId = req.params.noteId;
+    const { title, content, labels, reminder, isPinned, color } = req.body;
+    const user = req.user;
 
-  if (!title && !content && !tags && typeof isPinned === "undefined" && !reminder) {
-    return res.status(400).json({ error: false, message: "No changes provided" });
-  };
+    try {
+        const note = await Note.findOne({
+            _id: noteId,
+            $or: [
+                { userId: user._id },
+                { sharedWith: user.email }
+            ],
+        });
 
-  try {
-    const note = await Note.findOne({ _id: noteId, userId: user._id });
+        if (!note) {
+            throw new NotFoundError("Note not found or you don't have permission to edit it.");
+        };
 
-    if (!note) {
-      return res.status(404).json({ error: true, message: errors.noteNotFound });
+        const isOwner = note.userId.toString() === user._id.toString();
+
+        if (title) {
+            note.title = title;
+        };
+
+        if (content) {
+            note.content = content;
+        };
+
+        if (color) {
+            note.color = color;
+        };
+
+        if (Array.isArray(labels)) {
+            if (labels.length > 0) {
+                const foundLabels = await Label.find({
+                    name: { $in: labels },
+                     userId: note.userId 
+                });
+
+                if (foundLabels.length !== labels.length) {
+                    throw new ValidationError("One or more labels are invalid.");
+                };
+
+                note.labels = foundLabels.map(label => label._id);
+            } else {
+                note.labels = [];
+            };
+        };
+
+        if (isOwner) {
+            if (reminder !== undefined) {
+                note.reminder = reminder;
+            };
+
+            if (typeof isPinned !== "undefined") {
+                note.isPinned = isPinned;
+            }
+        };
+
+        await note.save();
+        const populatedNote = await getNoteByIdWithUser(note._id);
+        res.json({
+            success: true,
+            data: populatedNote,
+            message: "Note updated successfully"
+        });
+    } catch (error) {
+        next(error);
     };
-
-    if (title) {
-      note.title = title;
-    };
-
-    if (content) {
-      note.content = content;
-    };
-
-    if (Array.isArray(tags)) {
-      note.tags = tags;
-    };
-
-    if (reminder) {
-      note.reminder = reminder;
-    };
-
-    if (typeof isPinned !== "undefined") {
-      note.isPinned = isPinned;
-    };
-
-    await note.save();
-    const populatedNote = await getNoteByIdWithUser(note._id);
-    return res.json({ error: false, note: populatedNote, message: success.noteUpdated });
-  } catch (error) {
-    return res.status(500).json({ error: true, message: errors.internal });
-  }
 };
 
-exports.getAllNotes = async (req, res) => {
+exports.getAllNotes = async (req, res, next) => {
   const user = req.user;
-  const { searchQuery, tags, sortBy, page = 1, limit = 10 } = req.query;
-
-  if (!user || !user._id) {
-    return res.status(400).json({ error: true, message: errors.authRequired });
-  };
+  const { searchQuery, labels, sortBy, page = 1, limit = 10 } = req.query;
 
   try {
-    let filter = {
-      $or: [
-        { userId: user._id },
-        { sharedWith: user.email }
+    const pageLimit = Math.min(parseInt(limit), 50);
+    const skip = (page - 1) * pageLimit;
+
+    const filter = {
+      $and: [
+        {
+          $or: [
+            { userId: user._id },
+            { sharedWith: user.email }
+          ]
+        }
       ]
     };
 
     if (searchQuery) {
-      filter.$or = [
-        { title: { $regex: new RegExp(searchQuery, "i") } },
-        { content: { $regex: new RegExp(searchQuery, "i") } },
-      ];
-    }
-
-    if (tags && tags !== "") {
-      const tagsArray = tags.split(",").map((tag) => tag.trim());
-
-      const labelDocs = await Label.find({ name: { $in: tagsArray } }, "_id");
-      const labelIds = labelDocs.map(label => label._id);
-
-      filter.tags = { $in: labelIds };
+      filter.$and.push({
+        $or: [
+          { title: { $regex: searchQuery, $options: "i" } },
+          { content: { $regex: searchQuery, $options: "i" } }
+        ]
+      });
     };
 
-    let sortOptions = { isPinned: -1 };
+    if (labels && labels !== "") {
+      const labelsArray = labels.split(",").map(label => label.trim());
+      const labelDocs = await Label.find({
+        name: { $in: labelsArray },
+        userId: user._id
+      }, "_id");
+      const labelIds = labelDocs.map(label => label._id);
+      filter.$and.push({ labels: { $in: labelIds } });
+    };
+
+    const sortOptions = { isPinned: -1 };
     if (sortBy === "created") {
-      sortOptions = { createdOn: -1 };
-    } else if (sortBy === "updated") {
-      sortOptions = { updatedOn: -1 };
+      sortOptions.createdAt = -1;
+    } else {
+      sortOptions.updatedAt = -1;
     };
 
     const totalCount = await Note.countDocuments(filter);
     const notes = await Note.find(filter)
+      .populate("labels", "name")
       .populate("userId", "firstName lastName email")
-      .populate("tags", "name")
       .sort(sortOptions)
-      .skip((page - 1) * limit)
-      .limit(parseInt(limit));
+      .skip(skip)
+      .limit(pageLimit);
 
-    return res.json({
-      error: false,
+    res.json({
+      success: true,
       notes,
       currentPage: Number(page),
-      totalPages: Math.ceil(totalCount / limit),
+      totalPages: Math.ceil(totalCount / pageLimit),
       totalCount,
       message: success.notesFetched
     });
   } catch (error) {
-    return res.status(500).json({ error: true, message: errors.internal });
-  }
+    next(error);
+  };
 };
 
-exports.deleteNote = async (req, res) => {
+exports.deleteNote = async (req, res, next) => {
   const noteId = req.params.noteId;
   const user = req.user;
 
   try {
-    const note = await findUserNote(noteId, user._id);
+    const result = await Note.deleteOne({ _id: noteId, userId: user._id });
+    if (result.deletedCount === 0) {
+      throw new NotFoundError(errors.noteNotFound);
+    };
 
-    if (!note) {
-      return res.status(404).json({ error: true, message: errors.noteNotFound });
-    }
-
-    await Note.deleteOne({ _id: noteId, userId: user._id });
-    return res.json({ error: false, message: success.noteDeleted });
+    res.json({ success: true, message: success.noteDeleted });
   } catch (error) {
-    return res.status(500).json({ error: true, message: errors.internal });
-  }
+    next(error);
+  };
 };
 
-exports.updateNotePinned = async (req, res) => {
-  const noteId = req.params.noteId;
+exports.updateNotePinned = async (req, res, next) => {
+  const { noteId } = req.params;
   const { isPinned } = req.body;
-  const user = req.user;
 
   try {
-    const note = await findAndUpdateNote(noteId, user._id, { isPinned });
-    return res.json({ error: false, message: success.noteUpdated });
+    const note = await Note.findOneAndUpdate(
+      { _id: noteId, userId: req.user._id },
+      { isPinned },
+      { new: true }
+    );
+
+    if (!note) {
+      throw new NotFoundError("Note", noteId);
+    };
+    res.json({ success: true, message: success.noteUpdated, data: note });
   } catch (error) {
-    return res.status(500).json({ error: true, message: errors.internal });
-  }
+    next(error);
+  };
 };
 
-exports.archiveNote = async (req, res) => {
-  const noteId = req.params.noteId;
+exports.archiveNote = async (req, res, next) => {
+  const { noteId } = req.params;
   const { isArchived } = req.body;
-  const user = req.user;
 
   try {
-    const note = await findAndUpdateNote(noteId, user._id, { isArchived });
-    const msg = isArchived ? "Note archived successfully" : "Note unarchived successfully";
-    return res.json({ error: false, message: success.archived });
+    const note = await Note.findOneAndUpdate(
+      { _id: noteId, userId: req.user._id },
+      { isArchived }
+    );
+
+    if (!note) {
+      throw new NotFoundError("Note", noteId);
+    };
+
+    const message = isArchived ? success.archived : success.unarchive;
+    res.json({ success: true, message });
   } catch (error) {
-    return res.status(500).json({ error: true, message: errors.internal });
-  }
+    next(error);
+  };
 };
 
-exports.completeNote = async (req, res) => {
-  const noteId = req.params.noteId;
+exports.completeNote = async (req, res, next) => {
+  const { noteId } = req.params;
   const { isCompleted } = req.body;
-  const user = req.user;
 
   try {
-    const note = await findAndUpdateNote(noteId, user._id, { isCompleted });
-    const msg = isCompleted ? "Note marked as completed" : "Note marked as incomplete";
-    return res.json({ error: false, message: success.completed });
+    const note = await Note.findOneAndUpdate(
+      { _id: noteId, userId: req.user._id },
+      { isCompleted }
+    );
+
+    if (!note) {
+      throw new NotFoundError("Note", noteId);
+    };
+
+    const message = isCompleted ? success.completed : success.uncompleted;
+    res.json({ success: true, message });
   } catch (error) {
-    return res.status(500).json({ error: true, message: errors.internal });
-  }
+    next(error);
+  };
 };
 
-exports.addLabel = async (req, res) => {
+exports.addLabel = async (req, res, next) => {
   const noteId = req.params.noteId;
   const { label } = req.body;
   const user = req.user;
 
-  if (!label || label.trim() === "") {
-    return res.status(400).json({ error: true, message: errors.labelRequired });
-  };
-
   try {
-    const note = await Note.findOne({ _id: noteId, userId: user._id })
+    const note = await Note.findOne({
+      _id: noteId,
+      $or: [{ userId: user._id }, { sharedWith: user.email }]
+    });
 
     if (!note) {
-      return res.status(404).json({ error: true, message: errors.noteNotFound });
+      throw new NotFoundError("Note not found or you don't have permission to edit it.");
     };
 
-    if (!note.tags.includes(label)) {
-      note.tags.push(label);
-      await note.save();
+    const labelDoc = await Label.findOne({ name: label, userId: user._id });
+    if (!labelDoc) {
+      throw new NotFoundError(`Label "${label}" does not exist for this note's owner.`);
     };
 
-    return res.json({ error: false, note, message: success.labelAdded });
+    await Note.updateOne(
+      { _id: noteId },
+      { $addToSet: { labels: labelDoc._id } }
+    );
+
+    const populatedNote = await getNoteByIdWithUser(noteId);
+    res.json({ success: true, note: populatedNote, message: success.labelAdded });
   } catch (error) {
-    return res.status(500).json({ error: true, message: errors.internal });
-  }
+    next(error);
+  };
 };
 
-exports.removeLabel = async (req, res) => {
+exports.removeLabel = async (req, res, next) => {
   const noteId = req.params.noteId;
   const { label } = req.body;
   const user = req.user;
 
-  if (!label || label.trim() === "") {
-    return res.status(400).json({ error: true, message: errors.labelRequired });
-  };
-
   try {
-    const note = await Note.findOne({ _id: noteId, userId: user._id });
+    const note = await Note.findOne({
+      _id: noteId,
+      $or: [{ userId: user._id }, { sharedWith: user.email }]
+    });
 
     if (!note) {
-      return res.status(404).json({ error: true, message: errors.noteNotFound });
+      throw new NotFoundError("Note not found or you don't have permission to edit it.");
     };
 
-    note.tags = note.tags.filter((tag) => tag !== label);
-    await note.save();
-    return res.json({ error: false, note, message: success.labelRemoved });
+    const labelDoc = await Label.findOne({ name: label, userId: user._id });
+    if (!labelDoc) {
+      throw new NotFoundError("Label not found on this note.");
+    };
+
+    await Note.updateOne(
+      { _id: noteId },
+      { $pull: { labels: labelDoc._id } }
+    );
+
+    const populatedNote = await getNoteByIdWithUser(noteId);
+    res.json({ success: true, note: populatedNote, message: success.labelRemoved });
   } catch (error) {
-    return res.status(500).json({ error: true, message: errors.internal });
+    next(error);
   };
 };
 
-exports.setReminder = async (req, res) => {
+exports.setReminder = async (req, res, next) => {
   const noteId = req.params.noteId;
   const { reminder } = req.body;
   const user = req.user;
 
   try {
-    const note = await findAndUpdateNote(noteId, user._id, { reminder });
-    return res.json({ error: false, note, message: success.reminderSet });
+    const updatedNote = await Note.findOneAndUpdate(
+      { _id: noteId, $or: [{ userId: user._id }, { sharedWith: user.email }] },
+      { reminder },
+      { new: true }
+    );
+
+    if (!updatedNote) {
+      throw new NotFoundError("Note not found or you don't have permission to edit it.");
+    };
+
+    const populatedNote = await getNoteByIdWithUser(updatedNote._id);
+    res.json({ success: true, note: populatedNote, message: success.reminderSet });
   } catch (error) {
-    return res.status(404).json({ error: true, message: error.message || errors.noteNotFound });
+    next(error);
   };
 };
 
-exports.shareNote = async (req, res) => {
+exports.shareNote = async (req, res, next) => {
   const noteId = req.params.noteId;
   const { emails } = req.body;
-  const user = req.user;
-
-  if (!emails || !Array.isArray(emails) || emails.length === 0) {
-    return res.status(400).json({ error: true, message: errors.emailsRequired });
-  };
+  const sender = req.user;
 
   try {
-    const note = await Note.findOne({ _id: noteId, userId: user._id });
-
+    const note = await Note.findOne({ _id: noteId, userId: sender._id });
     if (!note) {
-      return res.status(404).json({ error: true, message: errors.noteNotFound });
+      throw new NotFoundError("Note not found or you don't have permission to share it.");
     };
 
-    const newEmails = emails.filter(email => !note.sharedWith.includes(email));
-    note.sharedWith.push(...newEmails);
-    await note.save();
-    const populatedNote = await getNoteByIdWithUser(note._id);
-    return res.json({ error: false, note: populatedNote, message: success.noteShared });
+    const recipients = await User.find({ email: { $in: emails } });
+    if (recipients.length !== emails.length) {
+      const foundEmails = recipients.map(r => r.email);
+      const notFoundEmails = emails.filter(e => !foundEmails.includes(e));
+      throw new NotFoundError(`User(s) not found: ${notFoundEmails.join(", ")}`);
+    };
+
+    const result = await Note.updateOne(
+      { _id: noteId },
+      { $addToSet: { sharedWith: { $each: emails } } }
+    );
+
+    for (const recipient of recipients) {
+      const notificationData = {
+        userId: recipient._id,
+        senderId: sender._id,
+        noteId: note._id,
+        type: "note-shared",
+        message: `${sender.firstName} shared a note with you: "${note.title}"`
+      };
+      await createNotification(notificationData);
+      const userRoom = `user_${recipient._id}`;
+      req.io.to(userRoom).emit("new_notification", notificationData);
+    };
+
+    const populatedNote = await getNoteByIdWithUser(noteId);
+    res.json({ success: true, note: populatedNote, message: success.shared });
   } catch (error) {
-    return res.status(500).json({ error: true, message: errors.internal });
+    next(error);
   };
 };
