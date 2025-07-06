@@ -9,10 +9,11 @@ const cookieParser = require("cookie-parser");
 const rateLimit = require("express-rate-limit");
 const compression = require("compression");
 
-const { isProduction, PORT, MONGO_URI, FRONTEND_URL, NODE_ENV } = require("./config/env");
+const { PORT, MONGO_URI, FRONTEND_URL, NODE_ENV } = require("./config/env");
 const logger = require("./logger");
 const routes = require("./routes");
 const errorHandler = require("./middleware/errorHandler");
+const isProduction = process.env.NODE_ENV === "production";
 
 const app = express();
 const server = http.createServer(app);
@@ -21,6 +22,7 @@ const corsOptions = {
     origin: isProduction ? FRONTEND_URL : "http://localhost:5173",
     credentials: true,
 };
+
 app.use(cors(corsOptions));
 app.options("*", cors(corsOptions));
 
