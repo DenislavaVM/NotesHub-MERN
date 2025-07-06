@@ -1,38 +1,76 @@
 require("dotenv").config();
 const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
 const cors = require("cors");
 const helmet = require("helmet");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
-const logger = require("./logger");
+const rateLimit = require("express-rate-limit");
+const compression = require("compression");
 
+const { isProduction, PORT, MONGO_URI, FRONTEND_URL, NODE_ENV } = require("./config/env");
+const logger = require("./logger");
 const routes = require("./routes");
+const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
+const server = http.createServer(app);
+
+const corsOptions = {
+    origin: isProduction ? FRONTEND_URL : "http://localhost:5173",
+    credentials: true,
+};
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
+
 app.set("trust proxy", 1);
-const PORT = process.env.PORT || 3000;
-
-const mongoURI = process.env.MONGO_URI || "mongodb://localhost:27017/notes-app";
-
-mongoose.connect(mongoURI);
-
-app.use(cookieParser());
-app.use(express.json());
-app.use(cors({ origin: "*" }));
 app.use(helmet());
+app.use(compression());
+app.use(express.json({ limit: "10kb" }));
+app.use(express.urlencoded({ extended: true, limit: "10kb" }));
+app.use(cookieParser());
 
-app.get("/", (req, res) => {
-  res.json({ message: "Welcome to NotesHub API!" });
+app.use((req, res, next) => {
+    logger.info(`Request: ${req.method} ${req.originalUrl}`);
+    logger.info(`Cookies Received: ${JSON.stringify(req.cookies)}`);
+    next();
 });
 
-app.use("/", routes);
-
-app.use((err, req, res, next) => {
-    logger.error(`Error: ${err.message}`);
-    res.status(err.status || 500).json({
-        error: true,
-        message: err.message || "Internal Server Error",
-    });
+const io = new Server(server, { cors: corsOptions });
+require("./socket")(io);
+app.use((req, res, next) => {
+    req.io = io;
+    next();
 });
 
-app.listen(PORT, () => logger.info(`Server started on port ${PORT}`));
+const connectWithRetry = async () => {
+    try {
+        await mongoose.connect(MONGO_URI, { maxPoolSize: 10, retryWrites: true, w: "majority" });
+        logger.info("MongoDB connected successfully");
+    } catch (err) {
+        logger.error(`MongoDB connection error: ${err.message}`);
+        setTimeout(connectWithRetry, 5000);
+    }
+};
+
+const startServer = async () => {
+    try {
+        await connectWithRetry();
+        app.use("/api", routes);
+        app.use(errorHandler);
+        app.use((req, res) => {
+            res.status(404).json({ error: true, message: `Cannot ${req.method} ${req.originalUrl}` });
+        });
+
+        server.listen(PORT, () => {
+            logger.info(`Server started on port ${PORT} in ${NODE_ENV} mode`);
+        });
+
+    } catch (err) {
+        logger.error("Failed to start server:", err);
+        process.exit(1);
+    }
+};
+
+startServer();
