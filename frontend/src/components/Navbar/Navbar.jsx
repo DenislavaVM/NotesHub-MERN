@@ -7,7 +7,7 @@ import { useAuth } from "../../hooks/useAuth";
 import NotificationBell from "./NotificationBell";
 import Sidebar from "../Sidebar/Sidebar";
 import "./Navbar.css";
-import SearchBar from "../searchBar/SearchBar";
+import SearchBar from "../SearchBar/SearchBar";
 
 const Navbar = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
