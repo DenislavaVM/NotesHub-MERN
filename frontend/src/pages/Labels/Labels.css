@@ -1,28 +1,165 @@
-.labels-page {
-    max-width: 600px;
-    margin: 2rem auto;
+.labels-page-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
     padding: 2rem;
-    background-color: #fff;
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
+    margin-top: 60px;
+}
+
+.labels-page {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: var(--card-bg-color);
+    border: 1px solid var(--input-border);
+    border-radius: var(--border-radius-lg);
+    padding: 2rem;
+}
+
+.back-to-notes-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--gray-color);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 2rem;
+    transition: color 0.2s ease;
+}
+
+.back-to-notes-btn:hover {
+    color: var(--primary-color);
 }
 
 .labels-title {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
-    text-align: center;
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    text-align: left;
+    color: var(--font-color);
 }
 
-.label-input-row {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+.form-group {
+    margin-bottom: 2rem;
 }
 
 .error-message {
     color: var(--error-color);
-    margin: 0.5rem 0;
     font-size: 0.875rem;
-    text-align: center;
+    text-align: left;
+    margin-top: 0.5rem;
+    padding-left: 0.25rem;
+}
+
+.labels-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.label-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--input-border);
+    transition: background-color 0.2s ease;
+}
+
+.labels-list .label-list-item:first-child {
+    border-top: 1px solid var(--input-border);
+}
+
+.label-name {
+    font-size: 1rem;
+    color: var(--font-color);
+    font-weight: 500;
+}
+
+.label-actions,
+.inline-edit-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.inline-edit-input {
+    flex-grow: 1;
+    margin-right: 1rem;
+    margin-bottom: 0;
+}
+
+.label-actions .icon-btn,
+.inline-edit-actions .icon-btn {
+    transition: all 0.2s ease-in-out;
+}
+
+.label-actions .icon-btn:hover,
+.inline-edit-actions .icon-btn:hover {
+    transform: scale(1.2);
+    color: var(--primary-color);
+}
+
+.label-input-row {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 0.75rem;
+}
+
+.label-input-row .input-box {
+    flex: 1;
+    padding: 0.75rem 1.25rem;
+    border-radius: 25px;
+    font-size: 1rem;
+}
+
+.add-label-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, var(--primary-color), #4f46e5);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    width: 48px;
+    height: 48px;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.add-label-btn::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.15);
+    top: 0;
+    left: 0;
+    opacity: 0;
+    transition: opacity 0.25s;
+}
+
+.add-label-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 18px rgba(79, 70, 229, 0.35);
+}
+
+.add-label-btn:active {
+    transform: scale(0.97);
+}
+
+.add-label-btn:hover::after {
+    opacity: 1;
+}
+
+.add-label-btn svg {
+    transition: transform 0.3s ease;
+}
+
+.add-label-btn:hover svg {
+    transform: rotate(90deg);
 }
