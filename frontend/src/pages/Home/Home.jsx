@@ -1,235 +1,129 @@
-import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import Modal from "react-modal";
 import { MdAdd } from "react-icons/md";
-import { Fab, Button, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+import { Fab } from "@mui/material";
+
 import NoDataImg from "../../assets/images/no-data.svg";
+import AddNotesImg from "../../assets/images/add-notes.svg";
 
-import apiClient from "../../utils/apiClient";
+import { useNotesContext } from "../../context/NotesContext";
+import { useSearch } from "../../context/SearchContext";
 import { useAuth } from "../../hooks/useAuth";
-import { useNotes } from "../../hooks/useNotes";
 
-import Navbar from "../../components/Navbar/Navbar";
 import NoteCard from "../../components/Cards/NoteCard";
 import AddEditNotes from "./AddEditNotes";
-import Notification from "../../components/Notification/Notification";
 import EmptyCard from "../../components/EmptyCard/EmptyCard";
-import AddNotesImg from "../../assets/images/add-notes.svg";
 import NoteSkeleton from "../../components/Loaders/NoteSkeleton";
+import ShareNoteModal from "../../components/modals/ShareNoteModal";
 
 import "./Home.css";
 
+Modal.setAppElement("#root");
+
 const Home = () => {
-  const [openAddEditModel, setOpenAddEditModal] = useState({
-    isShown: false,
-    type: "add",
-    data: null,
-  });
-
-  const [showNotificationMsg, setShowNotificationMsg] = useState({
-    isShown: false,
-    message: "",
-    type: "add",
-  });
-
-  const { setUser } = useAuth();
-  const [userInfo, setUserInfo] = useState(null);
-  const [isSearch, setIsSearch] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [tags, setTags] = useState([]);
-  const [sortBy, setSortBy] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  const { notes, loading, fetchNotes, deleteNote, togglePinNote, pagination } = useNotes();
-
-  const handleEdit = (noteDetails) => {
-    setOpenAddEditModal({ isShown: true, data: noteDetails, type: "edit" });
-  };
-
-  const showNotificationMessage = (message, type) => {
-    setShowNotificationMsg({
-      isShown: true,
-      message: message,
-      type: type,
-    });
-  };
-
-  const handleCloseNotification = () => {
-    setShowNotificationMsg({
-      isShown: false,
-      message: "",
-    });
-  };
-
-  const getUserInfo = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        return;
-      };
-
-      const response = await apiClient.get("/get-user");
-      if (response.data) {
-        setUser(response.data);
-        setUserInfo(response.data.user);
-      };
-    } catch (error) {
-      if (error.response.status === 401) {
-        localStorage.clear();
-        navigate("/login");
-      }
-    }
-  };
-
-  const handleSearch = (query, tagsArray) => {
-    setSearchQuery(query);
-    setTags(tagsArray || []);
-    setIsSearch(true);
-    setCurrentPage(1);
-  };
-
-  const handleDelete = async (note) => {
-    try {
-      await deleteNote(note._id);
-      showNotificationMessage("Note deleted successfully", "delete");
-    } catch {
-      console.log("An unexpected error occurred. Please try again.");
-    }
-  };
-
-  const handlePin = async (note) => {
-    try {
-      await togglePinNote(note._id, !note.isPinned);
-      showNotificationMessage("Note updated successfully", "update");
-    } catch {
-      console.log("An unexpected error occurred. Please try again.");
-    }
-  };
-
-  const handleClearSearch = () => {
-    setIsSearch(false);
-    setSearchQuery("");
-    setTags([]);
-    setCurrentPage(1);
-  };
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
+  const {
+    notes,
+    loading: notesLoading,
+    pagination,
+    setCurrentPage,
+    fetchNotes,
+    openAddEditModal,
+    setOpenAddEditModal,
+    shareModalState,
+    closeShareModal,
+  } = useNotesContext();
+  const { isSearching } = useSearch();
+  const { user, loading: authLoading } = useAuth();
 
   useEffect(() => {
-    getUserInfo();
-  }, []);
-
-  const tagKey = tags.join(",");
-  useEffect(() => {
-    fetchNotes({ searchQuery, tags, sortBy, page: currentPage });
-  }, [searchQuery, tagKey, sortBy, currentPage]);
-
-  useEffect(() => {
-    if (location.state?.openAddEditModal) {
-      setOpenAddEditModal({
-        isShown: true,
-        data: location.state.noteData,
-        type: location.state.type
-      });
-      window.history.replaceState({}, document.title);
+    if (user) {
+      fetchNotes();
     }
-  }, [location.state]);
+  }, [user, fetchNotes]);
+
+  if (authLoading) {
+    return <div className="loading-container">Loading session...</div>;
+  }
 
   return (
     <>
-      <Navbar
-        userInfo={userInfo}
-        onSearchNote={handleSearch}
-        handleClearSearch={handleClearSearch}
-        setTags={setTags}
-        setSortBy={setSortBy}
-      />
-
       <div className="home-container">
-        <div
-          className={`home-container ${notes.length === 0 ? "empty" : ""}`}
-        >
-          <div className={`note-grid ${notes.length === 0 ? "empty-grid" : ""}`}>
-            {loading ? (
-              Array.from({ length: 6 }).map((_, idx) => <NoteSkeleton key={idx} />)
-            ) : notes.length > 0 ? (
-              notes.map((note) => (
+        {notes.length > 0 ? (
+          <div className="note-grid-container">
+            {notesLoading
+              ? Array.from({ length: 8 }).map((_, idx) => <NoteSkeleton key={idx} />)
+              : notes.map((note) => (
                 <NoteCard
                   key={note._id}
-                  title={note.title}
-                  date={note.createdOn}
-                  content={note.content}
-                  tags={note.tags.map((tag) => tag.name)}
-                  isPinned={note.isPinned}
-                  onEdit={() => handleEdit(note)}
-                  onDelete={() => handleDelete(note)}
-                  onPinNote={() => handlePin(note)}
-                  noteId={note._id}
+                  note={note}
                 />
               ))
+            }
+          </div>
+        ) : (
+          <div className="empty-dashboard-container">
+            {notesLoading ? (
+              <p>Loading...</p>
             ) : (
               <EmptyCard
-                imgSrc={isSearch ? NoDataImg : AddNotesImg}
+                imgSrc={isSearching ? NoDataImg : AddNotesImg}
                 message={
-                  isSearch
+                  isSearching
                     ? "Oops! No notes found matching your search."
-                    : "Start creating your first note! Click the 'Add' button to jot down your thoughts, ideas, and reminders. Let's get started!"
+                    : "Start creating your first note!"
                 }
               />
             )}
           </div>
+        )}
 
-          {pagination && pagination.totalPages > 1 && (
-            <div className="pagination-container">
-              {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((page) => (
-                <button
-                  key={page}
-                  className={`pagination-button ${currentPage === page ? "active" : ""}`}
-                  onClick={() => handlePageChange(page)}
-                >
-                  {page}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+        {pagination && pagination.totalPages > 1 && (
+          <div className="pagination-container">
+            {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                className={`pagination-button ${pagination.currentPage === page ? "active" : ""}`}
+                onClick={() => setCurrentPage(page)}
+              >
+                {page}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       <Fab
         color="primary"
         aria-label="add"
-        style={{ position: "fixed", bottom: "20px", right: "20px" }}
+        className="add-note-fab"
         onClick={() => setOpenAddEditModal({ isShown: true, type: "add", data: null })}
       >
         <MdAdd />
       </Fab>
 
-      <Dialog open={openAddEditModel.isShown} onClose={() => setOpenAddEditModal({ isShown: false, type: "", data: null })}>
-        <DialogTitle>Add/Edit Note</DialogTitle>
-        <DialogContent>
-          <AddEditNotes
-            type={openAddEditModel.type}
-            noteData={openAddEditModel.data}
-            onClose={() => setOpenAddEditModal({ isShown: false, type: "add", data: null })}
-            getAllNotes={() => fetchNotes({ searchQuery, tags, sortBy })}
-            showNotificationMessage={showNotificationMessage}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenAddEditModal({ isShown: false, type: "", data: null })}>Cancel</Button>
-        </DialogActions>
-      </Dialog>
+      <Modal
+        isOpen={openAddEditModal.isShown}
+        onRequestClose={() => setOpenAddEditModal({ isShown: false, type: "add", data: null })}
+        overlayClassName="modal-overlay"
+        className="modal-content"
+      >
+        <AddEditNotes
+          type={openAddEditModal.type}
+          noteData={openAddEditModal.data}
+          onClose={() => {
+            setOpenAddEditModal({ isShown: false, type: "add", data: null });
+          }}
+        />
+      </Modal>
 
-      <Notification
-        isShown={showNotificationMsg.isShown}
-        message={showNotificationMsg.message}
-        type={showNotificationMsg.type}
-        onClose={handleCloseNotification}
-      />
+      {shareModalState.isShown && (
+        <ShareNoteModal
+          isOpen={shareModalState.isShown}
+          noteId={shareModalState.noteId}
+          onClose={closeShareModal}
+          onShareSuccess={closeShareModal}
+        />
+      )}
     </>
   );
 };
