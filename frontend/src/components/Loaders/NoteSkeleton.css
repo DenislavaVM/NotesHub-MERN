@@ -1,49 +1,64 @@
 .note-card.skeleton {
-    border: 1px solid var(--light-gray);
-    border-radius: 12px;
-    padding: 1.5rem;
-    background-color: #f3f4f6;
+    border: 1px solid var(--input-border);
+    border-radius: var(--border-radius);
+    padding: 1.25rem;
+    background-color: var(--card-bg-color);
     position: relative;
     overflow: hidden;
+    break-inside: avoid;
+    margin-bottom: 1rem;
 }
 
 .skeleton-header,
 .skeleton-content,
 .skeleton-tags {
-    background: #e5e7eb;
-    border-radius: 6px;
+    background: var(--background-color);
+    border-radius: var(--box-radius-small);
     margin-bottom: 1rem;
+    position: relative;
+    overflow: hidden;
 }
 
+.skeleton-header::after,
+.skeleton-content::after,
+.skeleton-tags::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, var(--light-gray), transparent);
+    animation: shimmer 1.5s infinite;
+}
+
+body.dark .skeleton-header::after,
+body.dark .skeleton-content::after,
+body.dark .skeleton-tags::after {
+    background: linear-gradient(90deg, transparent, #333, transparent);
+}
+
+
 .skeleton-header {
-    height: 20px;
-    width: 60%;
+    height: 38px;
+    width: 70%;
 }
 
 .skeleton-content {
-    height: 60px;
+    height: 80px;
     width: 100%;
 }
 
 .skeleton-tags {
-    height: 20px;
+    height: 22px;
     width: 40%;
+    margin-bottom: 0;
 }
 
-.note-card.skeleton::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -150px;
-    height: 100%;
-    width: 150px;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    animation: shimmer 1.2s infinite;
-}
 
 @keyframes shimmer {
     0% {
-        transform: translateX(0);
+        transform: translateX(-100%);
     }
 
     100% {
