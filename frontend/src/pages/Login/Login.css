@@ -1,27 +1,21 @@
-.login-container {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0;
-  background-color: var(--background-color);
-  flex-direction: column;
-}
-
 .login-form {
-  width: 100%;
-  max-width: 30rem;
-  border: 5px solid #ddd;
-  border-radius: var(--border-radius);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 26rem;
+  border: 1px solid var(--input-border);
+  border-radius: var(--border-radius-lg);
   background-color: var(--card-bg-color);
-  padding: 2rem;
+  padding: 2.5rem;
   text-align: center;
-  overflow: hidden;
+  box-shadow: var(--hover-shadow);
 }
 
 .login-title {
   font-size: 1.75rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
   font-weight: 700;
   color: var(--font-color);
   text-align: center;
@@ -29,17 +23,23 @@
 
 .input-box {
   width: 100%;
-  padding: 0.75rem;
+  padding: 0.9rem 1rem;
   margin-bottom: 1rem;
-  border: var(--input-border);
+  border: 1px solid var(--input-border);
   border-radius: var(--box-radius-small);
   font-size: 1rem;
+  background-color: var(--background-color);
+  color: var(--font-color);
   box-sizing: border-box;
-  transition: border-color 0.3s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+body.dark .input-box {
+  background-color: #2d2d2d;
 }
 
 .input-box::placeholder {
-  color: #9ca3af;
+  color: var(--gray-color);
 }
 
 .input-box:focus {
@@ -47,69 +47,31 @@
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
-.btn-primary {
-  background-color: var(--primary-color);
-  color: white;
-  padding: var(--button-padding);
-  border: none;
-  border-radius: var(--box-radius-small);
-  font-size: 1rem;
-  cursor: pointer;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 1rem;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
-  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
-}
-
-.btn-primary:hover {
-  background-color: var(--secondary-color);
-  box-shadow: 0 6px 12px rgba(0, 123, 255, 0.3);
-  transform: translateY(-2px);
-}
-
-.btn-primary:active {
-  background-color: #004085;
-  box-shadow: 0 3px 6px rgba(0, 123, 255, 0.2);
-  transform: translateY(0);
-}
-
 .error-message {
   color: var(--error-color);
   font-size: 0.875rem;
-  margin-top: 0.25rem;
+  margin-top: -0.5rem;
   margin-bottom: 1rem;
   text-align: left;
 }
 
-.input-error {
-  border-color: var(--error-color);
-  box-shadow: 0 0 0 3px rgba(217, 83, 79, 0.25);
+.register-prompt {
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--gray-color);
 }
 
-@media (max-width: 480px) {
-  .login-form {
-    padding: 1.5rem 1rem;
-    border-width: 2px;
-    max-width: 90%;
-  }
+.signup-link {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+}
 
-  .login-title {
-    font-size: 1.5rem;
-  }
+.signup-link:hover {
+  text-decoration: underline;
+}
 
-  .btn-primary {
-    font-size: 0.95rem;
-  }
-
-  .register-prompt {
-    font-size: 0.9rem;
-  }
-
-  .signup-link {
-    display: inline-block;
-    margin-top: 0.5rem;
-  }
+.login-form .btn-primary {
+  width: auto;
+  display: inline-block;
 }
