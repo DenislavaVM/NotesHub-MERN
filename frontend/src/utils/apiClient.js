@@ -1,7 +1,9 @@
 import axios from "axios";
 
+const TOKEN_STORAGE_KEY = "accessToken";
+
 const createApiClient = () => {
-    let accessToken = null;
+    let accessToken = localStorage.getItem(TOKEN_STORAGE_KEY) || null;
 
     const apiClient = axios.create({
         baseURL: import.meta.env.VITE_API_URL,
@@ -13,11 +15,14 @@ const createApiClient = () => {
 
     const setApiAccessToken = (token) => {
         accessToken = token;
+        if (token) {
+            localStorage.setItem(TOKEN_STORAGE_KEY, token);
+        } else {
+            localStorage.removeItem(TOKEN_STORAGE_KEY);
+        }
     };
 
-    const getAccessToken = () => {
-        return accessToken;
-    };
+    const getAccessToken = () => accessToken;
 
     const sessionExpiredEvent = new Event("sessionExpired");
 
@@ -28,9 +33,7 @@ const createApiClient = () => {
             }
             return config;
         },
-        (error) => {
-            return Promise.reject(error);
-        },
+        (error) => Promise.reject(error)
     );
 
     apiClient.interceptors.response.use(
@@ -52,7 +55,7 @@ const createApiClient = () => {
 
             if (url === "/auth/login" || url === "/auth/create-account") {
                 return Promise.reject(error);
-            };
+            }
 
             if (status === 401 && !originalRequest._retry) {
                 originalRequest._retry = true;
@@ -67,10 +70,11 @@ const createApiClient = () => {
                     const sessionError = new Error("Session expired");
                     sessionError.name = "SessionExpiredError";
                     return Promise.reject(sessionError);
-                };
-            };
+                }
+            }
+
             return Promise.reject(error);
-        },
+        }
     );
 
     return { apiClient, setApiAccessToken, getAccessToken };

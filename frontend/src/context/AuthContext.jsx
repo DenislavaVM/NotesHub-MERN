@@ -44,8 +44,13 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const checkUserSession = async () => {
+            const token = localStorage.getItem("accessToken");
+            if (token) {
+                setApiAccessToken(token);
+            };
+
             try {
-                const response = await apiClient.get("/users/get-user");
+                const response = await apiClient.get("/api/users/get-user");
                 if (response.data?.data?.user) {
                     setUser(response.data.data.user);
                 }
