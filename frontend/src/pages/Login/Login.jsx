@@ -48,7 +48,11 @@ const Login = () => {
           })}
           aria-label="Email"
         />
-        {errors.email && <p className="error-message">{errors.email.message}</p>}
+        {errors.email && (
+          <div className="error-wrapper">
+            <p className="error-message">{errors.email.message}</p>
+          </div>
+        )}
         <PasswordInput
           {...register("password", {
             required: "Password is required",
@@ -56,7 +60,9 @@ const Login = () => {
           placeholder="Password"
         />
         {errors.password && (
-          <p className="error-message">{errors.password.message}</p>
+          <div className="error-wrapper">
+            <p className="error-message">{errors.password.message}</p>
+          </div>
         )}
         {errors.root?.serverError && (
           <p className="server-error-message">{errors.root.serverError.message}</p>

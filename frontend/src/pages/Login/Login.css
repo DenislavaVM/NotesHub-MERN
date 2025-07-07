@@ -47,12 +47,17 @@ body.dark .input-box {
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
+.error-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: -0.5rem;
+  margin-bottom: 1rem;
+}
+
 .error-message {
   color: var(--error-color);
   font-size: 0.875rem;
-  margin-top: -0.5rem;
-  margin-bottom: 1rem;
-  text-align: left;
 }
 
 .server-error {
