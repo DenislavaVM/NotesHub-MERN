@@ -22,7 +22,7 @@
 }
 
 .note-editor-header .input-field {
-  color: black;
+  color: var(--font-color);
   font-size: 1.75rem;
   font-weight: 700;
   border: none;
@@ -45,9 +45,9 @@ body.dark .note-editor-header .input-field {
   color: var(--font-color);
 }
 
-body.dark .input-group .MuiInputBase-root {
-  background-color: var(--background-color) !important;
-  color: var(--font-color) !important;
+body.dark .add-edit-form .input-group .MuiInputBase-root {
+  background-color: transparent;
+  color: var(--font-color);
 }
 
 body.dark .MuiMenuItem-root {
@@ -117,7 +117,7 @@ body.dark .MuiSelect-root.MuiSelect-displayEmpty {
   border-radius: var(--border-radius);
   padding: 0.5rem;
   flex-grow: 1;
-  background-color: var(--background-color);
+  background-color: transparent;
 }
 
 .close-btn {
@@ -187,10 +187,10 @@ body.dark .MuiSelect-root.MuiSelect-displayEmpty {
   box-shadow: 0 0 8px -1px var(--primary-color);
 }
 
-.input-group .MuiInputBase-root {
-  background-color: var(--background-color) !important;
+.add-edit-form .input-group .MuiInputBase-root {
+  background-color: var(--background-color);
 }
 
-.input-group .MuiOutlinedInput-notchedOutline {
-  border-color: var(--input-border) !important;
+.add-edit-form .input-group .MuiOutlinedInput-notchedOutline {
+  border-color: var(--input-border);
 }

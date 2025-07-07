@@ -126,7 +126,7 @@ const AddEditNotes = ({ type, noteData, onClose }) => {
   };
 
   return (
-    <div className="add-edit-notes-content" style={{ backgroundColor: selectedColor }}>
+    <div className="add-edit-notes-content">
       <button className="close-btn icon-btn" onClick={onClose}>
         <MdClose />
       </button>
