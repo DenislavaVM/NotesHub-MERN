@@ -98,7 +98,7 @@ const Home = () => {
         className="add-note-fab"
         onClick={() => setOpenAddEditModal({ isShown: true, type: "add", data: null })}
       >
-        <MdAdd />
+        <MdAdd size={24} />
       </Fab>
 
       <Modal
