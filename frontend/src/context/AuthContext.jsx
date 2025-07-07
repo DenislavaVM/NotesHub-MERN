@@ -50,7 +50,7 @@ export const AuthProvider = ({ children }) => {
             };
 
             try {
-                const response = await apiClient.get("/api/users/get-user");
+                const response = await apiClient.get("/users/get-user");
                 if (response.data?.data?.user) {
                     setUser(response.data.data.user);
                 }
