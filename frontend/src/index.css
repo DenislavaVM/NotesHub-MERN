@@ -29,38 +29,67 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-.btn-primary {
-  padding: 0.9rem 2rem;
-  margin-top: 1rem;
-  font-size: 1rem;
-  font-weight: 500;
-  color: #fff;
-  background-color: var(--primary-color);
-  border: none;
-  border-radius: var(--box-radius-small);
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  padding: 0.7rem 1.5rem;
+  border-radius: 50px;
+  border: 1px solid transparent;
   cursor: pointer;
-  text-align: center;
   transition: all 0.2s ease-in-out;
-  width: auto;
-  display: inline-block;
+  font-size: 0.9rem;
+  text-align: center;
+  outline: none;
 }
 
-.btn-primary:hover {
-  background-color: #1565c0;
-  transform: translateY(-2px);
+/* Primary Button */
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.btn-primary:active {
-  transform: translateY(0);
+.btn-primary:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
 }
 
 .btn-primary:disabled {
-  background-color: var(--gray-color);
-  opacity: 0.7;
+  background: var(--gray-color);
   cursor: not-allowed;
+  opacity: 0.7;
   transform: none;
   box-shadow: none;
+}
+
+.btn-secondary {
+  background-color: var(--background-color);
+  border-color: var(--input-border);
+  color: var(--font-color);
+}
+
+.btn-secondary:hover {
+  border-color: var(--gray-color);
+  transform: translateY(-2px);
+}
+
+body.dark .btn-primary:hover {
+  box-shadow: 0 0 20px -5px var(--primary-color);
+}
+
+body.dark .btn-secondary {
+  background-color: #333;
+  border-color: #444;
+  color: var(--gray-color);
+}
+
+body.dark .btn-secondary:hover {
+  background-color: #444;
+  border-color: var(--gray-color);
+  color: var(--font-color);
 }
 
 .modal-overlay {

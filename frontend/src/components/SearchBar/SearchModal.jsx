@@ -51,14 +51,22 @@ const SearchModal = ({ isOpen, onClose }) => {
                         autoFocus
                     />
                 </div>
+
                 <div className="search-modal-actions">
-                    <button type="button" className="btn-secondary" onClick={clearAndClose}>
-                        <MdClear />
-                        Clear
-                    </button>
-                    <button type="submit" className="btn-primary">
+                    <button
+                        type="submit"
+                        className="btn btn-primary"
+                    >
                         <MdSearch />
                         Search
+                    </button>
+                    <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={clearAndClose}
+                    >
+                        <MdClear />
+                        Clear
                     </button>
                 </div>
             </form>
