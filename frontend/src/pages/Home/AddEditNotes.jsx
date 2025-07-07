@@ -9,10 +9,7 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import "./AddEditNotes.css";
 
-const EMPTY_CONTENT = {
-  type: "doc",
-  content: [{ type: "paragraph" }],
-};
+const EMPTY_CONTENT = "";
 
 const debounce = (fn, delay) => {
   let timeout;
@@ -28,7 +25,6 @@ const AddEditNotes = ({ type, noteData, onClose }) => {
   const socket = useSocket();
 
   const {
-    register,
     handleSubmit,
     control,
     setValue,
@@ -38,7 +34,7 @@ const AddEditNotes = ({ type, noteData, onClose }) => {
   } = useForm({
     defaultValues: {
       title: noteData?.title || "",
-      content: noteData?.content || "",
+      content: noteData?.content || EMPTY_CONTENT,
       labels: noteData?.labels?.map(l => l.name) || [],
       color: noteData?.color || "#ffffff",
     },
@@ -61,9 +57,9 @@ const AddEditNotes = ({ type, noteData, onClose }) => {
     extensions: [StarterKit],
     content: noteData?.content || EMPTY_CONTENT,
     onUpdate: ({ editor }) => {
-      const jsonContent = editor.getJSON();
-      setValue("content", jsonContent, { shouldDirty: true });
-      debouncedEmit("content", jsonContent);
+      const htmlContent = editor.getHTML();
+      setValue("content", htmlContent, { shouldDirty: true });
+      debouncedEmit("content", htmlContent);
     },
   });
 
@@ -77,7 +73,7 @@ const AddEditNotes = ({ type, noteData, onClose }) => {
       const newContent = noteData.content || EMPTY_CONTENT;
       setValue("content", newContent);
 
-      if (editor && JSON.stringify(editor.getJSON()) !== JSON.stringify(newContent)) {
+      if (editor && editor.getHTML() !== newContent) {
         editor.commands.setContent(newContent, false);
       };
     };
@@ -91,7 +87,7 @@ const AddEditNotes = ({ type, noteData, onClose }) => {
         const isEditorFocused = editor?.isFocused;
 
         if (data.field === "content" && editor && !isEditorFocused) {
-          if (JSON.stringify(editor.getJSON()) !== JSON.stringify(data.value)) {
+          if (editor.getHTML() !== data.value) {
             editor.commands.setContent(data.value, false);
             setValue("content", data.value, { shouldDirty: true });
           };
@@ -112,6 +108,12 @@ const AddEditNotes = ({ type, noteData, onClose }) => {
 
 
   const onSubmit = async (data) => {
+    const isContentEmpty = editor.getText().trim().length === 0;
+    if (isContentEmpty) {
+      setError("content", { type: "manual", message: "Content cannot be empty." });
+      return;
+    }
+
     try {
       if (type === "edit") {
         await editNote(noteData._id, data);
@@ -163,6 +165,7 @@ const AddEditNotes = ({ type, noteData, onClose }) => {
             <div className="tiptap-editor-wrapper">
               <EditorContent editor={editor} />
             </div>
+            {errors.content && <p className="error-message">{errors.content.message}</p>}
           </div>
 
           <div className="input-group">

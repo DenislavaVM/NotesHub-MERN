@@ -10,6 +10,7 @@ import {
 import { AuthContext } from "../../context/AuthContext";
 import { useNotesContext } from "../../context/NotesContext";
 import moment from "moment";
+import parse from "html-react-parser";
 import "./NoteCard.css";
 
 const NoteCard = ({ note }) => {
@@ -61,9 +62,9 @@ const NoteCard = ({ note }) => {
                 </button>
             </div>
 
-            <p className="note-content-text">
-                {content?.substring(0, 300) + (content?.length > 300 ? "..." : "")}
-            </p>
+            <div className="note-content-text">
+                {parse(content || "")}
+            </div>
 
             <div className="note-footer">
                 <div className="note-labels">
