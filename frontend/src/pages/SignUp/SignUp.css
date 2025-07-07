@@ -64,11 +64,19 @@ body.dark .input-box {
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
+.signup-form .error-message {
+  color: var(--error-color);
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+  text-align: center;
+  line-height: 1.2;
+}
+
 .error-message {
   color: var(--error-color);
   font-size: 0.8rem;
   margin-top: 0.25rem;
-  text-align: left;
+  text-align: center;
   line-height: 1.2;
 }
 

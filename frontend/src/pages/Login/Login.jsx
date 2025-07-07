@@ -59,7 +59,7 @@ const Login = () => {
           <p className="error-message">{errors.password.message}</p>
         )}
         {errors.root?.serverError && (
-          <p className="error-message">{errors.root.serverError.message}</p>
+          <p className="server-error-message">{errors.root.serverError.message}</p>
         )}
         <button type="submit" className="btn-primary" disabled={isSubmitting}>
           {isSubmitting ? "Logging in..." : "Login"}

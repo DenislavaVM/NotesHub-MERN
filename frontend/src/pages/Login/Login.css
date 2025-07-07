@@ -55,6 +55,19 @@ body.dark .input-box {
   text-align: left;
 }
 
+.server-error {
+  text-align: center;
+}
+
+.server-error-message {
+  color: var(--error-color);
+  font-size: 0.875rem;
+  width: 100%;
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
 .register-prompt {
   margin-top: 1.5rem;
   font-size: 0.9rem;
