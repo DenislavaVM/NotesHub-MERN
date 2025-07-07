@@ -65,7 +65,7 @@ export const NotesProvider = ({ children }) => {
         if (authLoading || !user) return;
         setLoading(true);
         try {
-            const response = await apiClient.get("api/notes/get-all-notes", {
+            const response = await apiClient.get("/notes/get-all-notes", {
                 params: {
                     searchQuery,
                     labels: labels.join(","),
@@ -87,7 +87,7 @@ export const NotesProvider = ({ children }) => {
 
     const addNote = async (payload) => {
         try {
-            await apiClient.post("/api/notes/add-note", payload);
+            await apiClient.post("/notes/add-note", payload);
             toast.success("Note added successfully");
             setOpenAddEditModal({ isShown: false, type: "add", data: null });
             await fetchNotes();
@@ -101,7 +101,7 @@ export const NotesProvider = ({ children }) => {
         setOpenAddEditModal({ isShown: false, type: "add", data: null });
 
         try {
-            const response = await apiClient.put(`api/notes/edit-note/${noteId}`, payload);
+            const response = await apiClient.put(`/notes/edit-note/${noteId}`, payload);
             const updatedNoteFromServer = response.data.data;
             setNotes(prevNotes =>
                 prevNotes.map(note =>
@@ -121,7 +121,7 @@ export const NotesProvider = ({ children }) => {
         setNotes(prevNotes => prevNotes.filter(note => note._id !== noteId));
 
         try {
-            await apiClient.delete(`api/notes/delete-note/${noteId}`);
+            await apiClient.delete(`/notes/delete-note/${noteId}`);
             toast.success("Note deleted successfully");
         } catch (err) {
             setNotes(previousNotes);
@@ -139,7 +139,7 @@ export const NotesProvider = ({ children }) => {
             return newNotes.sort((a, b) => (b.isPinned - a.isPinned));
         });
         try {
-            await apiClient.put(`api/notes/update-note-pinned/${noteId}`, { isPinned: !isPinned });
+            await apiClient.put(`/notes/update-note-pinned/${noteId}`, { isPinned: !isPinned });
             toast.success(!isPinned ? "Note pinned successfully" : "Note unpinned successfully");
         } catch (err) {
             toast.error("Pin update failed");
