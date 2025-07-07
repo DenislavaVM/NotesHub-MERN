@@ -2,6 +2,7 @@
 
 :root {
   --note-text-on-light-bg: #090909;
+  --pin-color: #4123a1;
 }
 
 .note-card {
@@ -130,10 +131,15 @@ body.dark .icon-btn:hover {
   background-color: #333;
 }
 
+body.dark .icon-btn {
+  color: var(--gray-color);
+  opacity: 0.9;
+}
+
 .pin-btn.pinned {
-  color: #4123a1;
+  color: var(--pin-color);
   opacity: 1;
-  text-shadow: 0 0 8px rgba(84, 61, 154, 0.7);
+  text-shadow: 0 0 8px var(--pin-color);
   transform: scale(1.1);
 }
 

@@ -140,7 +140,7 @@ export const NotesProvider = ({ children }) => {
         });
         try {
             await apiClient.put(`/notes/update-note-pinned/${noteId}`, { isPinned: !isPinned });
-            toast.success("Note pin status updated");
+            toast.success(!isPinned ? "Note pinned successfully" : "Note unpinned successfully");
         } catch (err) {
             toast.error("Pin update failed");
             setNotes(previousNotes);

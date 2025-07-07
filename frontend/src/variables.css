@@ -1,5 +1,6 @@
 :root {
   --primary-color: #1976d2;
+  --pin-color: #4123a1;
   --secondary-color: #388e3c;
   --gray-color: #757575;
   --light-gray: #f1f1f1;
@@ -34,6 +35,7 @@
 
 body.dark {
   --background-color: #191919;
+  --pin-color: #6ba5d7;
   --card-bg-color: #202020;
   --font-color: #e0e0e0;
   --primary-color: #6ba5d7;
