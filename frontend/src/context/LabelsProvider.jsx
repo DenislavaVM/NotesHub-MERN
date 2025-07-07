@@ -55,7 +55,13 @@ export const LabelsProvider = ({ children }) => {
     const updateLabel = async (labelId, name) => {
         setError(null);
         try {
-            await apiClient.put(`/labels/${labelId}`, { name });
+            const response = await apiClient.put(`/labels/${labelId}`, { name });
+            const updatedLabelFromServer = response.data.data;
+            setLabels((prevLabels) =>
+                prevLabels.map((label) =>
+                    label._id === labelId ? updatedLabelFromServer : label
+                ),
+            );
         } catch (err) {
             setError(err.response?.data?.message || "Failed to update label");
             throw err;
