@@ -16,7 +16,7 @@ const Login = () => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await apiClient.post("/login", data);
+      const response = await apiClient.post("/auth/login", data);
       if (response.data && response.data.accessToken) {
         login(response.data.user, response.data.accessToken);
       }
