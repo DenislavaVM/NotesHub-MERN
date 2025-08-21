@@ -15,6 +15,7 @@ const cookieOptions = {
   sameSite: isProduction ? "None" : "Lax",
 };
 
+
 const generateAndSetTokens = async (res, user, session) => {
   const accessToken = jwt.sign(
     { user: { _id: user._id, firstName: user.firstName, lastName: user.lastName, email: user.email } },
