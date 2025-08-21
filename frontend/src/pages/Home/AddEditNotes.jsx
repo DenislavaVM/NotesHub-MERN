@@ -68,7 +68,11 @@ const AddEditNotes = ({ type, noteData, onClose }) => {
   useEffect(() => {
     if (noteData) {
       setValue("title", noteData.title || "");
-      setValue("labels", noteData.labels?.map((label) => label.name) || []);
+      const labelNames =
+        (noteData.tags || noteData.labels || [])
+          .map((l) => (typeof l === "string" ? l : l?.name))
+          .filter(Boolean);
+      setValue("labels", labelNames);
       setValue("color", noteData.color || "#ffffff");
       const newContent = noteData.content || EMPTY_CONTENT;
       setValue("content", newContent);
@@ -106,6 +110,10 @@ const AddEditNotes = ({ type, noteData, onClose }) => {
     }
   }, [socket, noteData, type, setValue, editor]);
 
+  const idToName = (ids) =>
+    ids
+      .map((id) => availableLabels.find((l) => l._id === id)?.name)
+      .filter(Boolean);
 
   const onSubmit = async (data) => {
     const isContentEmpty = editor.getText().trim().length === 0;
@@ -115,11 +123,18 @@ const AddEditNotes = ({ type, noteData, onClose }) => {
     }
 
     try {
+      const payload = {
+        title: data.title?.trim() || "",
+        content: data.content,
+        color: data.color,
+        tags: idToName(data.labels),
+      };
+
       if (type === "edit") {
-        await editNote(noteData._id, data);
+        await editNote(noteData._id, payload);
       } else {
-        await addNote(data);
-      }
+        await addNote(payload);
+      };
       onClose();
     } catch (err) {
       const message = err.response?.data?.error?.message || `Failed to ${type} note.`;
