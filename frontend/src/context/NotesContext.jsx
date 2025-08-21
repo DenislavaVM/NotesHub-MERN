@@ -68,14 +68,24 @@ export const NotesProvider = ({ children }) => {
             const response = await apiClient.get("/notes/get-all-notes", {
                 params: {
                     searchQuery,
-                    labels: labels.join(","),
+                    tags: labels.join(","),
                     sortBy,
                     page: currentPage,
                 },
             });
-            const { notes: receivedNotes = [], ...paginationData } = response.data;
+            const {
+                notes: receivedNotes = [],
+                currentPage: respPage = 1,
+                totalPages: respTotalPages = 1,
+                totalCount: respTotalCount = 0,
+            } = response.data || {};
+
             setNotes(Array.isArray(receivedNotes) ? receivedNotes : []);
-            setPagination(paginationData);
+            setPagination({
+                currentPage: respPage ?? 1,
+                totalPages: respTotalPages ?? 1,
+                totalCount: respTotalCount ?? 0,
+            });
         } catch (err) {
             if (err.name !== "SessionExpiredError") {
                 toast.error(err.response?.data?.error?.message || "Failed to fetch notes");
@@ -132,12 +142,11 @@ export const NotesProvider = ({ children }) => {
 
     const togglePinNote = async (noteId, isPinned) => {
         const previousNotes = [...notes];
-        setNotes(prevNotes => {
-            const newNotes = prevNotes.map(note =>
-                note._id === noteId ? { ...note, isPinned: !isPinned } : note
-            );
-            return newNotes.sort((a, b) => (b.isPinned - a.isPinned));
-        });
+        setNotes(prevNotes =>
+            prevNotes
+                .map(n => (n._id === noteId ? { ...n, isPinned: !isPinned } : n))
+                .sort((a, b) => b.isPinned - a.isPinned)
+        );
         try {
             await apiClient.put(`/notes/update-note-pinned/${noteId}`, { isPinned: !isPinned });
             toast.success(!isPinned ? "Note pinned successfully" : "Note unpinned successfully");
