@@ -13,7 +13,7 @@ const createApiClient = () => {
         },
     });
 
-    
+
     const setApiAccessToken = (token) => {
         accessToken = token;
         if (token) {
@@ -29,7 +29,11 @@ const createApiClient = () => {
 
     apiClient.interceptors.request.use(
         (config) => {
-            if (accessToken) {
+            const base = import.meta.env.VITE_API_URL || "";
+            const urlPath = (config.url || "").replace(base, "");
+            const isRefresh = urlPath.endsWith("/auth/refresh");
+
+            if (!isRefresh && accessToken) {
                 config.headers.Authorization = `Bearer ${accessToken}`;
             }
             return config;
@@ -41,7 +45,6 @@ const createApiClient = () => {
         (response) => response,
         async (error) => {
             const originalRequest = error.config;
-            const url = originalRequest.url;
             const status = error.response?.status;
 
             const handleSessionExpired = () => {
@@ -49,22 +52,35 @@ const createApiClient = () => {
                 window.dispatchEvent(sessionExpiredEvent);
             };
 
-            if (url === "/auth/refresh" && (status === 401 || status === 403)) {
+            const base = import.meta.env.VITE_API_URL || "";
+            const urlPath = (originalRequest?.url || "").replace(base, "");
+            if (urlPath === "/auth/refresh" && (status === 401 || status === 403)) {
                 handleSessionExpired();
                 return Promise.reject(error);
             }
 
-            if (url === "/auth/login" || url === "/auth/create-account") {
+            if (urlPath === "/auth/login" || urlPath === "/auth/create-account") {
                 return Promise.reject(error);
             }
 
             if (status === 401 && !originalRequest._retry) {
                 originalRequest._retry = true;
                 try {
-                    const response = await apiClient.get("/auth/refresh");
-                    const newAccessToken = response.data.accessToken;
+                    const refreshRes = await apiClient.get("/auth/refresh");
+                    const newAccessToken =
+                        refreshRes?.data?.accessToken ??
+                        refreshRes?.data?.data?.accessToken ??
+                        refreshRes?.accessToken;
+
+                    if (!newAccessToken) {
+                        throw new Error("No access token returned from refresh");
+                    }
+
                     setApiAccessToken(newAccessToken);
-                    originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                    originalRequest.headers = {
+                        ...(originalRequest.headers || {}),
+                        Authorization: `Bearer ${newAccessToken}`,
+                    };
                     return apiClient(originalRequest);
                 } catch (refreshError) {
                     handleSessionExpired();

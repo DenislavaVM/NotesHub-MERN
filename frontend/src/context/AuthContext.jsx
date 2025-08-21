@@ -51,16 +51,19 @@ export const AuthProvider = ({ children }) => {
 
             try {
                 const response = await apiClient.get("/users/get-user");
-                if (response.data?.data?.user) {
-                    setUser(response.data.data.user);
-                }
+                const usr =
+                    response?.data?.user ??
+                    response?.data?.data?.user ??
+                    response?.user;
+
+                if (usr) setUser(usr);
             } catch (error) {
                 if (import.meta.env.DEV) {
                     console.log("No active session found.");
                 }
             } finally {
                 setLoading(false);
-            }
+            };
         };
 
         checkUserSession();

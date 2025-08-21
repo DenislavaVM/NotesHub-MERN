@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { ValidationError, AuthenticationError } = require("../errors");
+const { ValidationError, AuthenticationError, AuthorizationError } = require("../errors");
 const User = require("../models/user.model");
 const Note = require("../models/note.model");
 const logger = require("../logger");
@@ -11,10 +11,10 @@ const { isProduction, BCRYPT_SALT_ROUNDS } = require("../config/env");
 const cookieOptions = {
   httpOnly: true,
   secure: isProduction,
-  maxAge: 7 * 24 * 60 * 60 * 1000,
   sameSite: isProduction ? "None" : "Lax",
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+  path: "/api/auth",
 };
-
 
 const generateAndSetTokens = async (res, user, session) => {
   const accessToken = jwt.sign(
