@@ -1,97 +1,81 @@
 const Label = require("../models/label.model");
 const logger = require("../logger");
-const Note = require("../models/note.model");
-const {
-    ValidationError,
-    NotFoundError,
-    DatabaseError
-} = require("../errors");
 
-const broadcastLabelUpdate = (req) => {
-    const userId = req.user._id;
-    if (req.io) {
-        req.io.to(`user_${userId}`).emit("labels:updated");
-    }
-};
-
-exports.getAllLabels = async (req, res, next) => {
+exports.getAllLabels = async (req, res) => {
     const userId = req.user._id;
     try {
-        const labels = await Label.find({ userId }).sort({ name: 1 });
-        res.json({ success: true, data: labels });
+        const labels = await Label.find({ userId }).sort({ name: 1 }).lean();
+        return res.json({ error: false, labels });
     } catch (error) {
-        next(new DatabaseError("Failed to fetch labels"));
+        logger.error(`Error fetching labels: ${error.message}`);
+        return res.status(500).json({ error: true, message: "Failed to fetch labels" });
     };
 };
 
-exports.createLabel = async (req, res, next) => {
+exports.createLabel = async (req, res) => {
     const userId = req.user._id;
     const { name } = req.body;
 
+    if (!name) {
+        return res.status(400).json({ error: true, message: "Label name is required" });
+    };
+
     try {
-        const existing = await Label.findOne({ name, userId });
+        const existing = await Label.findOne({ name, userId }).lean();
         if (existing) {
-            throw new ValidationError("Label already exists");
+            return res.status(400).json({ error: true, message: "Label already exists" });
         };
 
         const label = new Label({ name, userId });
         await label.save();
-        broadcastLabelUpdate(req);
-        res.status(201).json({
-            success: true,
-            data: label,
-            message: "Label created successfully"
-        });
+        return res.json({ error: false, label, message: "Label created successfully" });
     } catch (error) {
-        next(error);
+        logger.error(`Error creating label: ${error.message}`);
+        return res.status(500).json({ error: true, message: "Failed to create label" });
     };
 };
 
-exports.updateLabel = async (req, res, next) => {
+exports.updateLabel = async (req, res) => {
     const userId = req.user._id;
     const labelId = req.params.labelId;
     const { name } = req.body;
 
+    if (!name) {
+        return res.status(400).json({ error: true, message: "Label name is required" });
+    };
+
     try {
-        const label = await Label.findOne({ _id: labelId, userId });
+        const label = await Label.findOneAndUpdate(
+            { _id: labelId, userId },
+            { name, updatedOn: new Date() },
+            { new: true }
+        );
+
         if (!label) {
-            throw new NotFoundError("Label", labelId);
+            return res.status(404).json({ error: true, message: "Label not found" });
         };
 
-        label.name = name;
-        await label.save();
-        broadcastLabelUpdate(req);
-
-        res.json({
-            success: true,
-            data: label,
-            message: "Label updated successfully"
-        });
+        return res.json({ error: false, label, message: "Label updated successfully" });
     } catch (error) {
-        next(error);
+        logger.error(`Error updating label: ${error.message}`);
+        return res.status(500).json({ error: true, message: "Failed to update label" });
     };
 };
 
-exports.deleteLabel = async (req, res, next) => {
+exports.deleteLabel = async (req, res) => {
+    const userId = req.user._id;
+    const labelId = req.params.labelId;
+
     try {
-        const userId = req.user._id;
-        const labelId = req.params.labelId;
         const label = await Label.findOne({ _id: labelId, userId });
         if (!label) {
-            throw new NotFoundError("Label", labelId);
+            return res.status(404).json({ error: true, message: "Label not found" });
         };
 
         await Label.deleteOne({ _id: labelId, userId });
-        await Note.updateMany(
-            { userId, labels: labelId },
-            { $pull: { labels: labelId } }
-        );
-        broadcastLabelUpdate(req);
-        res.json({
-            success: true,
-            message: "Label deleted successfully"
-        });
+        return res.json({ error: false, message: "Label deleted successfully" });
     } catch (error) {
-        next(error);
+        logger.error(`Error deleting label: ${error.message}`);
+        return res.status(500).json({ error: true, message: "Failed to delete label" });
     };
 };
